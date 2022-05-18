@@ -12,4 +12,17 @@
     <string name="name">Name</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="home">Home</string>
+    <string name="have_a_good_day">Have a good day!</string>
+    <string name="your_location">Your Location</string>
+    <string name="refresh">Refresh</string>
+    <string name="our_features">Our Features</string>
+    <string name="home_camera_icon">Home Camera Icon</string>
+    <string name="scan_your_tire">Scan Your Tire</string>
+    <string name="to_see_the_condition_of_your_tire">To see the condition of your tire</string>
+    <string name="home_map_icon">Home Map Icon</string>
+    <string name="nearest_repair_shop">Nearest Repair shop</string>
+    <string name="quickly_find_nearest_repair_shop_for_your_tire">Quickly find nearest repair shop for your tire</string>
+    <string name="home_history_icon">Home History Icon</string>
+    <string name="history">History</string>
+    <string name="history_message">Review the activities you have done with us</string>
 </resources>
