@@ -1,0 +1,11 @@
+{
+  "name": "dtire-backend",
+  "version": "1.0.0",
+  "description": "Backend untuk aplikasi mobile DTire",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Allief Nuriman",
+  "license": "MIT"
+}
