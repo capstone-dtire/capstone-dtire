@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">DTireApp</string>
+    <string name="logo">Logo</string>
+    <string name="welcome_to_dtire">Welcome to DTire!</string>
+    <string name="login_to_continue">Login To Continue</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="join_us">Join Us!</string>
+    <string name="create_your_account">Create Your Account</string>
+    <string name="name">Name</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="home">Home</string>
 </resources>
