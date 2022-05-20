@@ -63,7 +63,7 @@ function register(req, res) {
                 .catch(function (error) {
                     res.status(500).json({
                         status: 500,
-                        message: 'Internal server error',
+                        message: 'Internal server error while registering user details',
                         error: error
                     });
                     return;
@@ -72,7 +72,7 @@ function register(req, res) {
         .catch(function (error) {
             res.status(500).json({
                 status: 500,
-                message: 'Internal server error',
+                message: 'Internal server error while registering user',
                 error: error
             });
             return;
@@ -104,6 +104,7 @@ function login(req, res) {
                 // send the user object back to the client
                 res.json({
                     status: 200,
+                    user_id: user.user_id,
                     message: 'User logged in',
                 });
                 return;
@@ -124,8 +125,188 @@ function login(req, res) {
         });
 }
 
+function getUser(req, res) {
+    const user_id = req.params.user_id;
+
+    db.one('SELECT user_id, name FROM public.user WHERE user_id = $1', [user_id])
+        .then(function (user) {
+            res.json({
+                status: 200,
+                user: user
+            });
+            return;
+        })
+        .catch(function (error) {
+            res.json({
+                status: 500,
+                message: 'Internal server error while getting user',
+                error: error
+            });
+            return;
+        });
+}
+
+function getUserDetails(req, res) {
+    const user_id = req.params.user_id;
+
+    // get all from user_details where user_id = user_id
+    db.one('SELECT * FROM public.user_details WHERE user_id = $1', [user_id])
+        .then(function (user_details) {
+            res.json({
+                status: 200,
+                user_details: user_details
+            });
+            return;
+        })
+        .catch(function (error) {
+            res.json({
+                status: 500,
+                message: 'Internal server error while getting user details',
+                error: error
+            });
+            return;
+        });
+}
+
+function editUserDetails(req, res) {
+    const user_id = req.params.user_id;
+    const address = req.body.address;
+    const phone = req.body.phone;
+
+    // query if address or phone is null
+    db.one('SELECT address, phone FROM public.user_details WHERE user_id = $1', [user_id])
+        .then(function (user_details) {
+            if (address === null) {
+                address = user_details.address;
+            }
+            if (phone === null) {
+                phone = user_details.phone;
+            }
+            // update user_details
+            db.none('UPDATE public.user_details SET address = $1, phone = $2 WHERE user_id = $3', [address, phone, user_id])
+                .then(function () {
+                    res.json({
+                        status: 200,
+                        message: 'User details updated'
+                    });
+                    return;
+                })
+                .catch(function (error) {
+                    res.json({
+                        status: 500,
+                        message: 'Internal server error when updating user details',
+                        error: error
+                    });
+                    return;
+                });
+        })
+        .catch(function (error) {
+            res.json({
+                status: 500,
+                message: 'Internal server error when getting user details',
+                error: error
+            });
+            return;
+        });
+}
+
+function editUserNameOrEmail(req, res) {
+    const user_id = req.params.user_id;
+    const name = req.body.name;
+    const email = req.body.email;
+
+    // query if name or email is null
+    db.one('SELECT name, email FROM public.user WHERE user_id = $1', [user_id])
+        .then(function (user) {
+            if (name === null) {
+                name = user.name;
+            }
+            if (email === null) {
+                email = user.email;
+            }
+            // update user
+            db.none('UPDATE public.user SET name = $1, email = $2 WHERE user_id = $3', [name, email, user_id])
+                .then(function () {
+                    res.json({
+                        status: 200,
+                        message: 'User updated'
+                    });
+                    return;
+                })
+                .catch(function (error) {
+                    res.json({
+                        status: 500,
+                        message: 'Internal server error when updating user',
+                        error: error
+                    });
+                    return;
+                });
+        })
+        .catch(function (error) {
+            res.json({
+                status: 500,
+                message: 'Internal server error when getting user',
+                error: error
+            });
+            return;
+        });
+}
+
+function addDetectionHistory(req, res) {
+    const user_id = req.params.user_id;
+    
+    // Generate a random detection_id
+    const detection_id = uuidv4();
+
+    // Generate date and time with timezone
+    const date = new Date();
+    const time = date.toLocaleString('en-US', {
+        timeZone: 'Asia/Jakarta',
+        hour12: false,
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric"
+    });
+
+    const condition_title = req.body.condition_title;
+    const recommendation = req.body.recommendation;
+
+    // check if condition_title or recommendation is null
+    // reject if any of them is null
+    if (condition_title === null || recommendation === null) {
+        res.json({
+            status: 400,
+            message: 'Invalid request'
+        });
+        return;
+    }
+
+    // insert into detection_history
+    db.none('INSERT INTO public.detection_history(detection_id, user_id, condition_title, recommendation, time) VALUES($1, $2, $3, $4, $5)', [detection_id, user_id, condition_title, recommendation, time])
+        .then(function () {
+            res.json({
+                status: 200,
+                message: 'Detection history added'
+            });
+            return;
+        })
+        .catch(function (error) {
+            res.json({
+                status: 500,
+                message: 'Internal server error when adding detection history',
+                error: error
+            });
+            return;
+        });
+}
+
 module.exports = {
     index: index,
     register: register,
-    login: login
+    login: login,
+    getUser: getUser,
+    getUserDetails: getUserDetails,
+    editUserDetails: editUserDetails,
+    editUserNameOrEmail: editUserNameOrEmail,
+    addDetectionHistory: addDetectionHistory 
 };
