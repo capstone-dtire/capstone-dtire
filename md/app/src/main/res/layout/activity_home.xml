@@ -26,8 +26,9 @@
         android:layout_marginTop="8dp"
         android:clickable="true"
         android:focusable="true"
-        app:layout_constraintTop_toBottomOf="@+id/tb_home"
-        tools:layout_editor_absoluteX="16dp">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tb_home">
         <!--        android:foreground="?attr/selectableItemBackground"-->
 
         <de.hdodenhof.circleimageview.CircleImageView
