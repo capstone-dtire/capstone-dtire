@@ -1,5 +1,4 @@
 const bcrypt = require('bcryptjs');
-const { response } = require('express');
 const pgp = require('pg-promise')();
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
