@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.util.Pair
 import com.dtire.dtireapp.databinding.ActivityResultBinding
 import com.dtire.dtireapp.ui.imagedetail.ImageDetailActivity
 
@@ -23,11 +25,16 @@ class ResultActivity : AppCompatActivity() {
 
         val picturePath = intent.getStringExtra(EXTRA_IMAGE)
         val result = BitmapFactory.decodeFile(picturePath)
+
         binding.ivResultPicture.setImageBitmap(result)
         binding.ivResultPicture.setOnClickListener {
+            val optionsCompat: ActivityOptionsCompat =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(
+                    this, binding.ivResultPicture, "detail_image"
+                )
             val intent = Intent(this@ResultActivity, ImageDetailActivity::class.java)
             intent.putExtra(ImageDetailActivity.EXTRA_IMAGE, picturePath)
-            startActivity(intent)
+            startActivity(intent, optionsCompat.toBundle())
         }
 
     }
