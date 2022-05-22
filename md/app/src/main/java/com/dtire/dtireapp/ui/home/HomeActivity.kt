@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.dtire.dtireapp.R
 import com.dtire.dtireapp.databinding.ActivityHomeBinding
+import com.dtire.dtireapp.ui.history.HistoryActivity
 import com.dtire.dtireapp.ui.result.ResultActivity
 import com.dtire.dtireapp.utils.createTempFile
 import com.dtire.dtireapp.utils.uriToFile
@@ -49,10 +50,15 @@ class HomeActivity : AppCompatActivity() {
         }
 
         binding.apply {
-            layoutHomeProfile.setOnClickListener {  }
+            layoutHomeProfile.setOnClickListener {
+
+            }
             layoutHomeToCamera.setOnClickListener { showDialog() }
             layoutHomeToMap.setOnClickListener {  }
-            layoutHomeToHistory.setOnClickListener {  }
+            layoutHomeToHistory.setOnClickListener {
+                val intent = Intent(this@HomeActivity, HistoryActivity::class.java)
+                startActivity(intent)
+            }
         }
 
     }
