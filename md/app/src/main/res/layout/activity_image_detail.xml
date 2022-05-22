@@ -4,24 +4,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
     tools:context=".ui.imagedetail.ImageDetailActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tb_image_detail"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.75"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.jsibbold.zoomage.ZoomageView
         android:id="@+id/iv_image_detail"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:zoomage_restrictBounds="false"
-        app:zoomage_animateOnReset="true"
-        app:zoomage_autoResetMode="UNDER"
-        app:zoomage_autoCenter="true"
-        app:zoomage_zoomable="true"
-        app:zoomage_translatable="true"
-        app:zoomage_minScale="0.6"
-        app:zoomage_maxScale="8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tb_image_detail"
+        app:zoomage_animateOnReset="true"
+        app:zoomage_autoCenter="true"
+        app:zoomage_autoResetMode="UNDER"
+        app:zoomage_maxScale="8"
+        app:zoomage_minScale="0.6"
+        app:zoomage_restrictBounds="false"
+        app:zoomage_translatable="true"
+        app:zoomage_zoomable="true"
         tools:srcCompat="@tools:sample/backgrounds/scenic" />
 </androidx.constraintlayout.widget.ConstraintLayout>

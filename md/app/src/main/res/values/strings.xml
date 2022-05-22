@@ -25,4 +25,8 @@
     <string name="home_history_icon">Home History Icon</string>
     <string name="history">History</string>
     <string name="history_message">Review the activities you have done with us</string>
+    <string name="choose">Choose</string>
+    <string name="gallery">From Gallery</string>
+    <string name="from_camera">From Camera</string>
+    <string name="from_gallery">From Gallery</string>
 </resources>
