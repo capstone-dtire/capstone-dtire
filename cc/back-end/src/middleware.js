@@ -170,8 +170,8 @@ function getUserDetails(req, res) {
 
 function editUserDetails(req, res) {
     const user_id = req.params.user_id;
-    const address = req.body.address;
-    const phone = req.body.phone;
+    let address = req.body.address || null;
+    let phone = req.body.phone || null;
 
     // query if address or phone is null
     db.one('SELECT address, phone FROM public.user_details WHERE user_id = $1', [user_id])
@@ -212,8 +212,18 @@ function editUserDetails(req, res) {
 
 function editUserNameOrEmail(req, res) {
     const user_id = req.params.user_id;
-    const name = req.body.name;
-    const email = req.body.email;
+    let name = req.body.name || null;
+
+    // Validate email
+    if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(req.body.email)) {
+        res.status(400).json({
+            status: 400,
+            message: 'Invalid email address'
+        });
+        return;
+    }
+
+    let email = req.body.email || null;
 
     // query if name or email is null
     db.one('SELECT name, email FROM public.user WHERE user_id = $1', [user_id])
@@ -253,27 +263,28 @@ function editUserNameOrEmail(req, res) {
 }
 
 function addDetectionHistory(req, res) {
-    const user_id = req.params.user_id;
+    const user_id = req.body.user_id;
     
     // Generate a random detection_id
     const detection_id = uuidv4();
 
-    // Generate date and time with timezone
-    const date = new Date();
-    const time = date.toLocaleString('en-US', {
+    // Generate timestamp with timezone Asia/Jakarta, use intl
+    const timestamp = new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Asia/Jakarta',
-        hour12: false,
-        hour: "numeric",
-        minute: "numeric",
-        second: "numeric"
-    });
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    }).format(new Date());
 
     const condition_title = req.body.condition_title;
     const recommendation = req.body.recommendation;
 
     // check if condition_title or recommendation is null
     // reject if any of them is null
-    if (condition_title === null || recommendation === null) {
+    if (condition_title === null || recommendation === null || user_id === null) {
         res.json({
             status: 400,
             message: 'Invalid request'
@@ -282,7 +293,7 @@ function addDetectionHistory(req, res) {
     }
 
     // insert into detection_history
-    db.none('INSERT INTO public.detection_history(detection_id, user_id, condition_title, recommendation, time) VALUES($1, $2, $3, $4, $5)', [detection_id, user_id, condition_title, recommendation, time])
+    db.none('INSERT INTO public.detection_history(detection_id, user_id, date_of_check, condition_title, recommendation) VALUES($1, $2, $3, $4, $5)', [detection_id, user_id, timestamp, condition_title, recommendation])
         .then(function () {
             res.json({
                 status: 200,
