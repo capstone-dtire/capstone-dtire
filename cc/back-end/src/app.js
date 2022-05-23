@@ -3,7 +3,10 @@ var cors = require('cors');
 const app = express();
 const routes = require('./router');
 
-app.use(cors());
+app.use(cors({
+    // allow from all origins
+    origin: '*'
+}));
 app.use(routes);
 
 app.listen(3000, function () {
