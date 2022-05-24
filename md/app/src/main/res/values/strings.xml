@@ -34,4 +34,12 @@
     <string name="right_arrow_icon">Right arrow icon</string>
     <string name="title_of_the_condition">Title of the condition</string>
     <string name="_01_01_2022">01/01/2022</string>
+    <string name="edit">Edit</string>
+    <string name="address">Address</string>
+    <string name="phone">Phone</string>
+    <string name="cancel">Cancel</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="empty_string">-</string>
+    <string name="user_name">User\'s name</string>
+    <string name="logout">Logout</string>
 </resources>
