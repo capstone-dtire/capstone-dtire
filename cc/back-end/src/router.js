@@ -10,9 +10,9 @@ router.post('/api/register', register);
 router.post('/api/login', login);
 router.get('/api/user/:user_id', getUser);
 router.get('/api/user_details/:user_id', getUserDetails);
+router.get('/api/detection_history/:user_id', getDetectionHistory);
 router.put('/api/user_details/:user_id', editUserDetails);
 router.put('/api/user/:user_id', editUserNameOrEmail);
 router.post('/api/detection_history', addDetectionHistory);
-router.post('/api/detection_history/:user_id', addDetectionHistory);
 
 module.exports = router;
