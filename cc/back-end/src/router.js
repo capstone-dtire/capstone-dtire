@@ -13,5 +13,6 @@ router.get('/api/user_details/:user_id', getUserDetails);
 router.put('/api/user_details/:user_id', editUserDetails);
 router.put('/api/user/:user_id', editUserNameOrEmail);
 router.post('/api/detection_history', addDetectionHistory);
+router.post('/api/detection_history/:user_id', addDetectionHistory);
 
 module.exports = router;
