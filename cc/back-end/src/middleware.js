@@ -235,6 +235,20 @@ function editUserNameOrEmail(req, res) {
             if (email === null) {
                 email = user.email;
             }
+            else {
+                // check if email is already in use
+                db.one('SELECT email FROM public.user WHERE email = $1 and user_id != $2', [email, user_id])
+                    .then(function (user) {
+                        // Check if the result is empty
+                        if (user.email === null) {
+                            res.status(400).json({
+                                status: 400,
+                                message: 'Email already in use'
+                            });
+                            return;
+                        }
+                    });
+            }
             // update user
             db.none('UPDATE public.user SET name = $1, email = $2 WHERE user_id = $3', [name, email, user_id])
                 .then(function () {
@@ -280,8 +294,8 @@ function addDetectionHistory(req, res) {
         second: '2-digit'
     }).format(new Date());
 
-    // Change the timestamp from ISO, DMY to ISO, MDY
-    timestamp = timestamp.replace(/\D/g, '').replace(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/, '$2-$3-$1 $4:$5:$6');
+    // Convert timestamp to epoch
+    timestamp = new Date(timestamp).getTime();
 
     const condition_title = req.body.condition_title;
     const recommendation = req.body.recommendation;
