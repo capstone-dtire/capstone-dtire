@@ -58,13 +58,22 @@
         <EditText
             android:id="@+id/et_login_email"
             style="@style/EditTextStyle"
-            android:inputType="textEmailAddress"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.187"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_login_email"
             android:importantForAutofill="no"
+            android:inputType="textEmailAddress"
             tools:ignore="LabelFor" />
+
+        <TextView
+            android:id="@+id/tv_email_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:textColor="@color/red"
+            app:layout_constraintStart_toStartOf="@+id/et_login_email"
+            app:layout_constraintTop_toBottomOf="@+id/et_login_email" />
 
         <TextView
             android:id="@+id/tv_login_password"
@@ -78,7 +87,7 @@
             app:layout_constraintTop_toBottomOf="@+id/et_login_email" />
 
         <EditText
-            android:id="@+id/editText"
+            android:id="@+id/et_login_password"
             style="@style/EditTextStyle"
             android:inputType="textPassword"
             app:layout_constraintEnd_toEndOf="parent"
@@ -87,6 +96,15 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_login_password"
             android:importantForAutofill="no"
             tools:ignore="LabelFor" />
+
+        <TextView
+            android:id="@+id/tv_password_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:textColor="@color/red"
+            app:layout_constraintStart_toStartOf="@+id/et_login_password"
+            app:layout_constraintTop_toBottomOf="@+id/et_login_password" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_login"
@@ -98,7 +116,7 @@
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editText" />
+            app:layout_constraintTop_toBottomOf="@+id/et_login_password" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_register"
@@ -110,5 +128,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_login" />
+
+
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

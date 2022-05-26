@@ -8,10 +8,13 @@ import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import com.dtire.dtireapp.R
+import com.dtire.dtireapp.data.preferences.UserPreference
 import com.dtire.dtireapp.databinding.ActivityProfileBinding
+import com.dtire.dtireapp.ui.login.LoginActivity
 
 class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
+    private lateinit var preference: UserPreference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +28,14 @@ class ProfileActivity : AppCompatActivity() {
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.primary_green)
         window.decorView.systemUiVisibility = 0
+
+        preference = UserPreference(this)
+        binding.btnLogout.setOnClickListener {
+            preference.deleteUser()
+            val intent = Intent(this@ProfileActivity, LoginActivity::class.java)
+            finish()
+            startActivity(intent)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
