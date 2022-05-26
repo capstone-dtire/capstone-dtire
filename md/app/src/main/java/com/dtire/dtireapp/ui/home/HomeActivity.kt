@@ -1,11 +1,14 @@
 package com.dtire.dtireapp.ui.home
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.location.Geocoder
+import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -21,17 +24,22 @@ import androidx.core.content.FileProvider
 import com.dtire.dtireapp.R
 import com.dtire.dtireapp.databinding.ActivityHomeBinding
 import com.dtire.dtireapp.ui.history.HistoryActivity
+import com.dtire.dtireapp.ui.map.MapsActivity
 import com.dtire.dtireapp.ui.profile.ProfileActivity
 import com.dtire.dtireapp.ui.result.ResultActivity
 import com.dtire.dtireapp.utils.createTempFile
 import com.dtire.dtireapp.utils.uriToFile
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import java.io.File
+import java.util.*
 
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var currentPhotoPath: String
     private var getFile: File? = null
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,19 +58,89 @@ class HomeActivity : AppCompatActivity() {
             )
         }
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        getMyLastLocation()
+
         binding.apply {
             layoutHomeProfile.setOnClickListener {
                 val intent = Intent(this@HomeActivity, ProfileActivity::class.java)
                 startActivity(intent)
             }
             layoutHomeToCamera.setOnClickListener { showDialog() }
-            layoutHomeToMap.setOnClickListener {  }
+            layoutHomeToMap.setOnClickListener {
+                val intent = Intent(this@HomeActivity, MapsActivity::class.java)
+                startActivity(intent)
+            }
             layoutHomeToHistory.setOnClickListener {
                 val intent = Intent(this@HomeActivity, HistoryActivity::class.java)
                 startActivity(intent)
             }
+            btnHomeRefresh.setOnClickListener { getMyLastLocation() }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getMyLastLocation()
+    }
+
+    private val locationRequestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            when {
+                permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> {
+                    getMyLastLocation()
+                }
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> {
+                    getMyLastLocation()
+                }
+                else -> {
+                    // No location access granted.
+                }
+            }
         }
 
+
+    private fun checkPermission(permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getMyLastLocation() {
+        if     (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
+            checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+        ){
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    val city = getCityName(location.latitude, location.longitude)
+                    binding.tvHomeLocation.text = city
+                } else {
+                    Toast.makeText(
+                        this@HomeActivity,
+                        "Location is not found. Try Again",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        } else {
+            locationRequestPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
+
+    private fun getCityName(lat: Double, lng: Double): String {
+        val geocoder = Geocoder(this, Locale.getDefault())
+        val address = geocoder.getFromLocation(lat, lng, 1)
+
+        return "${address[0].locality}, ${address[0].countryName}"
     }
 
     private fun showDialog() {
@@ -164,7 +242,11 @@ class HomeActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        private val REQUIRED_PERMISSIONS = arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
         private const val REQUEST_CODE_PERMISSIONS = 10
     }
 

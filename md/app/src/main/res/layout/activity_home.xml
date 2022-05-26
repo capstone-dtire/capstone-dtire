@@ -52,7 +52,7 @@
                 android:id="@+id/tv_home_greeting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hi, Uvuvwevwevwe"
+                android:text="@string/hi_user"
                 android:textColor="@color/primary_text"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -97,7 +97,7 @@
             android:id="@+id/tv_home_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Hell"
+            android:text="@string/loading"
             android:textColor="@color/white"
             android:textSize="12sp"
             app:drawableStartCompat="@drawable/ic_baseline_location_on_24" />

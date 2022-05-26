@@ -42,4 +42,7 @@
     <string name="empty_string">-</string>
     <string name="user_name">User\'s name</string>
     <string name="logout">Logout</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="loading">Loading&#8230;</string>
+    <string name="hi_user">Hi, User!</string>
 </resources>
