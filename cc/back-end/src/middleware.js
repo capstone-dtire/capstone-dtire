@@ -330,8 +330,8 @@ function getDetectionHistory(req, res) {
         .then(function (detection_history) {
             // Change all date_of_check to readable format (e.g. to 2019-01-01 12:00:00) without moment.js
             for (let i = 0; i < detection_history.length; i++) {
-                let date_of_check = new Date(detection_history[i].date_of_check);
-                detection_history[i].date_of_check = date_of_check.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' });
+                let date_of_check = new Date(+detection_history[i].date_of_check);
+                detection_history[i].date_of_check = date_of_check.toLocaleString();
             }
             res.json({
                 status: 200,
