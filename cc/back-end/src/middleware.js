@@ -323,7 +323,7 @@ function addDetectionHistory(req, res) {
 
 function getDetectionHistory(req, res) {
     // Sanitize user_id with pg-escape
-    const user_id = pgEscape(req.params.user_id);
+    const user_id = req.params.user_id;
 
     // get all from detection_history where user_id = user_id
     db.any('SELECT * FROM public.detection_history WHERE user_id = $1', [user_id])
