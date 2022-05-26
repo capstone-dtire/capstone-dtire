@@ -283,19 +283,8 @@ function addDetectionHistory(req, res) {
     // Generate a random detection_id
     const detection_id = uuidv4();
 
-    // Generate timestamp with timezone Asia/Jakarta, use intl
-    let timestamp = new Intl.DateTimeFormat('en-GB', {
-        timeZone: 'Asia/Jakarta',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    }).format(new Date());
-
-    // Convert timestamp to epoch
-    timestamp = new Date(timestamp).getTime();
+    // Get current epoch time with timezone Asia/Jakarta without moment.js
+    const timestamp = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' });
 
     const condition_title = req.body.condition_title;
     const recommendation = req.body.recommendation;
