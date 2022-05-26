@@ -17,6 +17,7 @@ function register(req, res) {
             status: 400,
             message: 'You need to provide a name, email, and password'
         });
+        return;
     }
 
     // Test if req.body.email is valid
