@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
-const { index, register, login, getUser, getUserDetails, editUserDetails, editUserNameOrEmail, addDetectionHistory } = require('./middleware');
+const { index, register, login, getUser, getUserDetails, editUserDetails, editUserNameOrEmail, addDetectionHistory, getDetectionHistory } = require('./middleware');
 
 router.use(bodyParser.json());
 
