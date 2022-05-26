@@ -270,7 +270,7 @@ function addDetectionHistory(req, res) {
     const detection_id = uuidv4();
 
     // Generate timestamp with timezone Asia/Jakarta, use intl
-    const timestamp = new Intl.DateTimeFormat('en-GB', {
+    let timestamp = new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Asia/Jakarta',
         year: 'numeric',
         month: '2-digit',
@@ -279,6 +279,9 @@ function addDetectionHistory(req, res) {
         minute: '2-digit',
         second: '2-digit'
     }).format(new Date());
+
+    // Change the timestamp from ISO, DMY to ISO, MDY
+    timestamp = timestamp.replace(/\D/g, '').replace(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/, '$2-$3-$1 $4:$5:$6');
 
     const condition_title = req.body.condition_title;
     const recommendation = req.body.recommendation;
