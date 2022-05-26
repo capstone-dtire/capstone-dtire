@@ -240,7 +240,7 @@ function editUserNameOrEmail(req, res) {
                 db.one('SELECT email FROM public.user WHERE email = $1 and user_id != $2', [email, user_id])
                     .then(function (user) {
                         // Check if the result is empty
-                        if (user.email === null) {
+                        if (user.email !== null) {
                             res.status(400).json({
                                 status: 400,
                                 message: 'Email already in use'
