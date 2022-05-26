@@ -311,7 +311,7 @@ function addDetectionHistory(req, res) {
     }
 
     // insert into detection_history
-    db.none('INSERT INTO public.detection_history(detection_id, user_id, date_of_check, condition_title, recommendation) VALUES($1, $2, $3, $4, $5)', [detection_id, user_id, timestamp, condition_title, recommendation])
+    db.none('INSERT INTO public.detection_history(detection_id, user_id, condition_title, recommendation, date_of_check) VALUES($1, $2, $3, $4, $5)', [detection_id, user_id, condition_title, recommendation, timestamp])
         .then(function () {
             res.json({
                 status: 200,
