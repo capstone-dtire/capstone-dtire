@@ -284,7 +284,10 @@ function addDetectionHistory(req, res) {
     const detection_id = uuidv4();
 
     // Get current epoch time with timezone Asia/Jakarta without moment.js
-    const timestamp = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' });
+    let timestamp = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' });
+
+    // convert timestamp to epoch time
+    timestamp = new Date(timestamp).getTime();
 
     const condition_title = req.body.condition_title;
     const recommendation = req.body.recommendation;
