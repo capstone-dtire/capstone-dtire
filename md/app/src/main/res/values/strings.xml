@@ -45,4 +45,8 @@
     <string name="title_activity_maps">MapsActivity</string>
     <string name="loading">Loading&#8230;</string>
     <string name="hi_user">Hi, User!</string>
+    <string name="no_empty_email">Email cannot be empty</string>
+    <string name="use_email_format">Please use email format</string>
+    <string name="no_empty_password">Password cannot be empty</string>
+    <string name="minimum_password_length">Password minimum contain 8 characters</string>
 </resources>
