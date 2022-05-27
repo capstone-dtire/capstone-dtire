@@ -7,10 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
-import android.view.Window
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import com.dtire.dtireapp.R
 import com.dtire.dtireapp.data.State
 import com.dtire.dtireapp.data.preferences.UserPreference

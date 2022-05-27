@@ -3,6 +3,7 @@ package com.dtire.dtireapp.data
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.dtire.dtireapp.data.response.LoginResponse
+import com.dtire.dtireapp.data.response.RegisterResponse
 import com.dtire.dtireapp.data.retrofit.ApiConfig
 import com.dtire.dtireapp.data.retrofit.ApiService
 import retrofit2.Call
@@ -34,5 +35,29 @@ class Repository {
             }
         })
         return loginUser
+    }
+
+    fun registerUser(name: String, email: String, password: String): LiveData<State<RegisterResponse>> {
+        val registeredUser = MutableLiveData<State<RegisterResponse>>()
+
+        registeredUser.postValue(State.Loading())
+        retrofit.registerUser(name, email, password).enqueue(object : Callback<RegisterResponse> {
+            override fun onResponse(
+                call: Call<RegisterResponse>,
+                response: Response<RegisterResponse>
+            ) {
+                val user = response.body()
+                if (user == null) {
+                    registeredUser.postValue(State.Error("Email already used"))
+                } else {
+                    registeredUser.postValue((State.Success(user)))
+                }
+            }
+
+            override fun onFailure(call: Call<RegisterResponse>, t: Throwable) {
+                registeredUser.postValue(State.Error(t.message))
+            }
+        })
+        return registeredUser
     }
 }
