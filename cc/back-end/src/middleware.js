@@ -55,8 +55,8 @@ function register(req, res) {
             // then continue to send 200 status code
             db.none('INSERT INTO public.user_details(user_id, address, phone) VALUES($1, $2, $3)', [user_id, null, null])
                 .then(function () {
-                    res.status(200).json({
-                        status: 200,
+                    res.status(201).json({
+                        status: 201,
                         message: 'User registered'
                     });
                     return;
@@ -129,19 +129,28 @@ function login(req, res) {
 function getUser(req, res) {
     const user_id = req.params.user_id;
 
-    db.one('SELECT user_id, name FROM public.user WHERE user_id = $1', [user_id])
+    db.any('SELECT user_id, name FROM public.user WHERE user_id = $1', [user_id])
         .then(function (user) {
-            res.json({
-                status: 200,
-                user: user
-            });
-            return;
+            // Check if the result is null
+            if (user.length === 0) {
+                res.status(404).json({
+                    status: 404,
+                    message: 'User not found'
+                });
+                return;
+            } else {
+                res.json({
+                    status: 200,
+                    user: user
+                });
+                return;
+            }
         })
         .catch(function (error) {
             res.json({
-                status: 500,
-                message: 'Internal server error while getting user',
-                error: error
+                    status: 500,
+                    message: 'Internal server error while getting user',
+                    error: error
             });
             return;
         });
@@ -151,13 +160,22 @@ function getUserDetails(req, res) {
     const user_id = req.params.user_id;
 
     // get all from user_details where user_id = user_id
-    db.one('SELECT * FROM public.user_details WHERE user_id = $1', [user_id])
+    db.any('SELECT * FROM public.user_details WHERE user_id = $1', [user_id])
         .then(function (user_details) {
-            res.json({
-                status: 200,
-                user_details: user_details
-            });
-            return;
+            // Check if the result is null
+            if (user_details.length === 0) {
+                res.status(404).json({
+                    status: 404,
+                    message: 'User not found'
+                });
+                return;
+            } else {
+                res.json({
+                    status: 200,
+                    user_details: user_details
+                });
+                return;
+            }
         })
         .catch(function (error) {
             res.json({
@@ -171,6 +189,27 @@ function getUserDetails(req, res) {
 
 function editUserDetails(req, res) {
     const user_id = req.params.user_id;
+
+    // Check if the user_id is existent
+    db.any('SELECT * FROM public.user_details WHERE user_id = $1', [user_id])
+        .then(function (user_details) {
+            if (user_details.length === 0) {
+                res.status(404).json({
+                    status: 404,
+                    message: 'User not found'
+                });
+                return;
+            }
+        })
+        .catch(function (error) {
+            res.json({
+                status: 500,
+                message: 'Internal server error while checking user',
+                error: error
+            });
+            return;
+        });
+
     let address = req.body.address || null;
     let phone = req.body.phone || null;
 
@@ -186,8 +225,8 @@ function editUserDetails(req, res) {
             // update user_details
             db.none('UPDATE public.user_details SET address = $1, phone = $2 WHERE user_id = $3', [address, phone, user_id])
                 .then(function () {
-                    res.json({
-                        status: 200,
+                    res.status(204).json({
+                        status: 204,
                         message: 'User details updated'
                     });
                     return;
@@ -213,18 +252,39 @@ function editUserDetails(req, res) {
 
 function editUserNameOrEmail(req, res) {
     const user_id = req.params.user_id;
+
+    // Check if the user_id is existent
+    db.any('SELECT * FROM public.user WHERE user_id = $1', [user_id])
+        .then(function (user) {
+            if (user.length === 0) {
+                res.status(404).json({
+                    status: 404,
+                    message: 'User not found'
+                });
+                return;
+            }
+        })
+        .catch(function (error) {
+            res.json({
+                status: 500,
+                message: 'Internal server error while checking user',
+                error: error
+            });
+            return;
+        });
+
     let name = req.body.name || null;
+    let email = req.body.email || null;
 
     // Validate email
-    if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(req.body.email)) {
+    if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(req.body.email) && email !== null) {
+        console.log(req.body.email);
         res.status(400).json({
             status: 400,
             message: 'Invalid email address'
         });
         return;
     }
-
-    let email = req.body.email || null;
 
     // query if name or email is null
     db.one('SELECT name, email FROM public.user WHERE user_id = $1', [user_id])
@@ -252,8 +312,8 @@ function editUserNameOrEmail(req, res) {
             // update user
             db.none('UPDATE public.user SET name = $1, email = $2 WHERE user_id = $3', [name, email, user_id])
                 .then(function () {
-                    res.json({
-                        status: 200,
+                    res.status(204).json({
+                        status: 204,
                         message: 'User updated'
                     });
                     return;
@@ -279,6 +339,26 @@ function editUserNameOrEmail(req, res) {
 
 function addDetectionHistory(req, res) {
     const user_id = req.body.user_id;
+
+    // Check if the user_id is existent
+    db.any('SELECT * FROM public.user WHERE user_id = $1', [user_id])
+        .then(function (user) {
+            if (user.length === 0) {
+                res.status(404).json({
+                    status: 404,
+                    message: 'User not found'
+                });
+                return;
+            }
+        })
+        .catch(function (error) {
+            res.json({
+                status: 500,
+                message: 'Internal server error while checking user',
+                error: error
+            });
+            return;
+        });
     
     // Generate a random detection_id
     const detection_id = uuidv4();
@@ -305,8 +385,8 @@ function addDetectionHistory(req, res) {
     // insert into detection_history
     db.none('INSERT INTO public.detection_history(detection_id, user_id, condition_title, recommendation, date_of_check) VALUES($1, $2, $3, $4, $5)', [detection_id, user_id, condition_title, recommendation, timestamp])
         .then(function () {
-            res.json({
-                status: 200,
+            res.status(201).json({
+                status: 201,
                 message: 'Detection history added'
             });
             return;
@@ -324,6 +404,26 @@ function addDetectionHistory(req, res) {
 function getDetectionHistory(req, res) {
     // Sanitize user_id with pg-escape
     const user_id = req.params.user_id;
+
+    // Check if the user_id is existent
+    db.any('SELECT * FROM public.user WHERE user_id = $1', [user_id])
+        .then(function (user) {
+            if (user.length === 0) {
+                res.status(404).json({
+                    status: 404,
+                    message: 'User not found'
+                });
+                return;
+            }
+        })
+        .catch(function (error) {
+            res.json({
+                status: 500,
+                message: 'Internal server error while checking user',
+                error: error
+            });
+            return;
+        });
 
     // get all from detection_history where user_id = user_id
     db.any('SELECT * FROM public.detection_history WHERE user_id = $1', [user_id])
@@ -359,5 +459,6 @@ module.exports = {
     editUserDetails: editUserDetails,
     editUserNameOrEmail: editUserNameOrEmail,
     addDetectionHistory: addDetectionHistory,
-    getDetectionHistory: getDetectionHistory
+    getDetectionHistory: getDetectionHistory,
+    db: db
 };
