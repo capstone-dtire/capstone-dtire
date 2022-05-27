@@ -1,11 +1,16 @@
 package com.dtire.dtireapp.ui.login
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Patterns
+import android.view.View
+import android.view.Window
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import com.dtire.dtireapp.R
 import com.dtire.dtireapp.data.State
 import com.dtire.dtireapp.data.preferences.UserPreference
@@ -86,10 +91,19 @@ class LoginActivity : AppCompatActivity(), StateCallback<LoginResponse> {
 
     override fun onFailed(message: String?) {
         Toast.makeText(this@LoginActivity, "$message", Toast.LENGTH_SHORT).show()
+        val progressBar = ObjectAnimator.ofFloat(binding.loginLoading, View.ALPHA, 0f).setDuration(300)
+        AnimatorSet().apply {
+            play(progressBar)
+            start()
+        }
     }
 
     override fun onLoading() {
-//
+        val progressBar = ObjectAnimator.ofFloat(binding.loginLoading, View.ALPHA, 1f).setDuration(300)
+        AnimatorSet().apply {
+            play(progressBar)
+            start()
+        }
     }
 
     override fun onStart() {
