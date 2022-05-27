@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DTireApp</string>
+    <string name="app_name">DTire</string>
     <string name="logo">Logo</string>
     <string name="welcome_to_dtire">Welcome to DTire!</string>
     <string name="login_to_continue">Login To Continue</string>
@@ -45,4 +45,11 @@
     <string name="title_activity_maps">MapsActivity</string>
     <string name="loading">Loading&#8230;</string>
     <string name="hi_user">Hi, User!</string>
+    <string name="no_empty_email">Email cannot be empty</string>
+    <string name="use_email_format">Please use email format</string>
+    <string name="no_empty_password">Password cannot be empty</string>
+    <string name="minimum_password_length">Password minimum contain 8 characters</string>
+    <string name="no_empty_name">Name cannot be empty</string>
+    <string name="confirm_your_password">Please confirm your password</string>
+    <string name="password_not_match">Password didn\'t match</string>
 </resources>

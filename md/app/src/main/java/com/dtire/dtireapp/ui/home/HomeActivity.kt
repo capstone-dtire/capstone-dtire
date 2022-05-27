@@ -22,8 +22,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.dtire.dtireapp.R
+import com.dtire.dtireapp.data.preferences.UserPreference
 import com.dtire.dtireapp.databinding.ActivityHomeBinding
 import com.dtire.dtireapp.ui.history.HistoryActivity
+import com.dtire.dtireapp.ui.login.LoginActivity
 import com.dtire.dtireapp.ui.map.MapsActivity
 import com.dtire.dtireapp.ui.profile.ProfileActivity
 import com.dtire.dtireapp.ui.result.ResultActivity
@@ -38,6 +40,7 @@ import java.util.*
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var currentPhotoPath: String
+    private lateinit var preferences: UserPreference
     private var getFile: File? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -58,6 +61,7 @@ class HomeActivity : AppCompatActivity() {
             )
         }
 
+        preferences = UserPreference(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         getMyLastLocation()
 
@@ -82,6 +86,17 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         getMyLastLocation()
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        if (!preferences.isLoggedIn()) {
+            val intent = Intent(applicationContext, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            finish()
+            startActivity(intent)
+        }
     }
 
     private val locationRequestPermissionLauncher =
