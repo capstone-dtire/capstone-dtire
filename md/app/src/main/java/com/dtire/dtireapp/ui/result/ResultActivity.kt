@@ -7,9 +7,8 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityOptionsCompat
-import androidx.core.util.Pair
 import com.dtire.dtireapp.databinding.ActivityResultBinding
-import com.dtire.dtireapp.ui.imagedetail.ImageDetailActivity
+import com.dtire.dtireapp.ui.imageDetail.ImageDetailActivity
 
 class ResultActivity : AppCompatActivity() {
     private lateinit var binding: ActivityResultBinding
