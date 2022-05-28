@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.dtire.dtireapp.data.response.LoginResponse
 import com.dtire.dtireapp.data.response.RegisterResponse
+import com.dtire.dtireapp.data.response.UserResponse
 import com.dtire.dtireapp.data.retrofit.ApiConfig
 import com.dtire.dtireapp.data.retrofit.ApiService
 import retrofit2.Call
@@ -59,5 +60,26 @@ class Repository {
             }
         })
         return registeredUser
+    }
+
+    fun getUser(id: String): LiveData<State<UserResponse>> {
+        val userData = MutableLiveData<State<UserResponse>>()
+
+        userData.postValue(State.Loading())
+        retrofit.getUser(id).enqueue(object : Callback<UserResponse> {
+            override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
+                val userResponse = response.body()
+                if (userResponse != null) {
+                    userData.postValue(State.Success(userResponse))
+                } else {
+                    userData.postValue(State.Error("Get user failed"))
+                }
+            }
+
+            override fun onFailure(call: Call<UserResponse>, t: Throwable) {
+                userData.postValue(State.Error(t.message))
+            }
+        })
+        return userData
     }
 }
