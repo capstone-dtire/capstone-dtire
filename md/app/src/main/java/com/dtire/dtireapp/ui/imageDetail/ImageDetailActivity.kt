@@ -1,4 +1,4 @@
-package com.dtire.dtireapp.ui.imagedetail
+package com.dtire.dtireapp.ui.imageDetail
 
 import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
