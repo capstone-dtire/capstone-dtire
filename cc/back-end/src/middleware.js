@@ -49,31 +49,18 @@ function register(req, res) {
     const user_id = uuidv4();
 
     // try to insert the user into the database
-    db.none('INSERT INTO public.user (user_id, email, password, name) VALUES($1, $2, $3, $4)', [user_id, email, hashedPassword, name])
+    db.none('INSERT INTO public.user (user_id, email, password, name, address, phone) VALUES($1, $2, $3, $4, $5, $6)', [user_id, email, hashedPassword, name, null, null])
         .then(function () {
-            // Insert the user data to user_details: user_id, address (if any), phone number (if any)
-            // then continue to send 200 status code
-            db.none('INSERT INTO public.user_details(user_id, address, phone) VALUES($1, $2, $3)', [user_id, null, null])
-                .then(function () {
-                    res.status(201).json({
-                        status: 201,
-                        message: 'User registered'
-                    });
-                    return;
-                })
-                .catch(function (error) {
-                    res.status(500).json({
-                        status: 500,
-                        message: 'Internal server error while registering user details',
-                        error: error
-                    });
-                    return;
-                });
+            res.status(201).json({
+                status: 201,
+                message: 'User registered'
+            });
+            return;
         })
         .catch(function (error) {
             res.status(500).json({
                 status: 500,
-                message: 'Internal server error while registering user',
+                message: 'Internal server error when registering user',
                 error: error
             });
             return;
@@ -129,7 +116,7 @@ function login(req, res) {
 function getUser(req, res) {
     const user_id = req.params.user_id;
 
-    db.any('SELECT user_id, name FROM public.user WHERE user_id = $1', [user_id])
+    db.any('SELECT * FROM public.user WHERE user_id = $1', [user_id])
         .then(function (user) {
             // Check if the result is null
             if (user.length === 0) {
@@ -148,109 +135,15 @@ function getUser(req, res) {
         })
         .catch(function (error) {
             res.json({
-                    status: 500,
-                    message: 'Internal server error while getting user',
-                    error: error
-            });
-            return;
-        });
-}
-
-function getUserDetails(req, res) {
-    const user_id = req.params.user_id;
-
-    // get all from user_details where user_id = user_id
-    db.any('SELECT * FROM public.user_details WHERE user_id = $1', [user_id])
-        .then(function (user_details) {
-            // Check if the result is null
-            if (user_details.length === 0) {
-                res.status(404).json({
-                    status: 404,
-                    message: 'User not found'
-                });
-                return;
-            } else {
-                res.json({
-                    status: 200,
-                    user_details: user_details
-                });
-                return;
-            }
-        })
-        .catch(function (error) {
-            res.json({
                 status: 500,
-                message: 'Internal server error while getting user details',
+                message: 'Internal server error while getting user',
                 error: error
             });
             return;
         });
 }
 
-function editUserDetails(req, res) {
-    const user_id = req.params.user_id;
-
-    // Check if the user_id is existent
-    db.any('SELECT * FROM public.user_details WHERE user_id = $1', [user_id])
-        .then(function (user_details) {
-            if (user_details.length === 0) {
-                res.status(404).json({
-                    status: 404,
-                    message: 'User not found'
-                });
-                return;
-            }
-        })
-        .catch(function (error) {
-            res.json({
-                status: 500,
-                message: 'Internal server error while checking user',
-                error: error
-            });
-            return;
-        });
-
-    let address = req.body.address || null;
-    let phone = req.body.phone || null;
-
-    // query if address or phone is null
-    db.one('SELECT address, phone FROM public.user_details WHERE user_id = $1', [user_id])
-        .then(function (user_details) {
-            if (address === null) {
-                address = user_details.address;
-            }
-            if (phone === null) {
-                phone = user_details.phone;
-            }
-            // update user_details
-            db.none('UPDATE public.user_details SET address = $1, phone = $2 WHERE user_id = $3', [address, phone, user_id])
-                .then(function () {
-                    res.status(204).json({
-                        status: 204,
-                        message: 'User details updated'
-                    });
-                    return;
-                })
-                .catch(function (error) {
-                    res.json({
-                        status: 500,
-                        message: 'Internal server error when updating user details',
-                        error: error
-                    });
-                    return;
-                });
-        })
-        .catch(function (error) {
-            res.json({
-                status: 500,
-                message: 'Internal server error when getting user details',
-                error: error
-            });
-            return;
-        });
-}
-
-function editUserNameOrEmail(req, res) {
+function editUser(req, res) {
     const user_id = req.params.user_id;
 
     // Check if the user_id is existent
@@ -275,6 +168,8 @@ function editUserNameOrEmail(req, res) {
 
     let name = req.body.name || null;
     let email = req.body.email || null;
+    let address = req.body.address || null;
+    let phone = req.body.phone || null;
 
     // Validate email
     if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(req.body.email) && email !== null) {
@@ -287,13 +182,19 @@ function editUserNameOrEmail(req, res) {
     }
 
     // query if name or email is null
-    db.one('SELECT name, email FROM public.user WHERE user_id = $1', [user_id])
+    db.one('SELECT name, email, address, phone FROM public.user WHERE user_id = $1', [user_id])
         .then(function (user) {
             if (name === null) {
                 name = user.name;
             }
             if (email === null) {
                 email = user.email;
+            }
+            if (address === null) {
+                address = user.address;
+            }
+            if (phone === null) {
+                phone = user.phone;
             }
             else {
                 // check if email is already in use
@@ -310,7 +211,7 @@ function editUserNameOrEmail(req, res) {
                     });
             }
             // update user
-            db.none('UPDATE public.user SET name = $1, email = $2 WHERE user_id = $3', [name, email, user_id])
+            db.none('UPDATE public.user SET name = $1, email = $2, address = $3, phone = $4 WHERE user_id = $5', [name, email, address, phone, user_id])
                 .then(function () {
                     res.status(204).json({
                         status: 204,
@@ -455,9 +356,7 @@ module.exports = {
     register: register,
     login: login,
     getUser: getUser,
-    getUserDetails: getUserDetails,
-    editUserDetails: editUserDetails,
-    editUserNameOrEmail: editUserNameOrEmail,
+    editUser: editUser,
     addDetectionHistory: addDetectionHistory,
     getDetectionHistory: getDetectionHistory,
     db: db
