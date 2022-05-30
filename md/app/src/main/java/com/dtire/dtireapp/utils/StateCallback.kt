@@ -11,4 +11,6 @@ interface StateCallback<T> {
         get() = View.INVISIBLE
     val visible: Int
         get() = View.VISIBLE
+    val gone: Int
+        get() = View.GONE
 }

@@ -29,8 +29,8 @@ class UserPreference(context: Context) {
         }
     }
 
-    fun getUserId(): String? {
-        return preferences.getString(USER_ID, "")
+    fun getUserId(): String {
+        return preferences.getString(USER_ID, "").toString()
     }
 
     fun getUserData(): UserItem {

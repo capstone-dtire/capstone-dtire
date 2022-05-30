@@ -68,6 +68,14 @@
         tools:ignore="LabelFor"
         android:inputType="text" />
 
+    <TextView
+        android:id="@+id/tv_name_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/red"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/et_edit_name"
+        app:layout_constraintTop_toBottomOf="@+id/et_edit_name" />
 
     <TextView
         android:id="@+id/tv_edit_email"
@@ -78,7 +86,7 @@
         android:text="@string/email"
         android:textColor="@color/primary_text"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_edit_name" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_name_error" />
 
     <EditText
         android:id="@+id/et_edit_email"
@@ -91,6 +99,14 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_edit_email"
         tools:ignore="LabelFor" />
 
+    <TextView
+        android:id="@+id/tv_email_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/red"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/et_edit_email"
+        app:layout_constraintTop_toBottomOf="@+id/et_edit_email" />
 
     <TextView
         android:id="@+id/tv_edit_address"
@@ -101,7 +117,7 @@
         android:text="@string/address"
         android:textColor="@color/primary_text"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_edit_email" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_email_error" />
 
     <EditText
         android:id="@+id/et_edit_address"

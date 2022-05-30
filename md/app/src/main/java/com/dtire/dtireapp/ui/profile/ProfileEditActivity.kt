@@ -47,42 +47,69 @@ class ProfileEditActivity : AppCompatActivity(), StateCallback<String>{
 
         preference = UserPreference(this)
         val userId = preference.getUserId()
-        val userData = preference.getUserData()
+        val localUserData = preference.getUserData()
+
+        binding.apply {
+            etEditEmail.setText(localUserData.email)
+            etEditName.setText(localUserData.name)
+            etEditAddress.setText(localUserData.address)
+            etEditPhone.setText(localUserData.phone)
+        }
 
         binding.apply {
             layoutEditPhoto.setOnClickListener { showDialog() }
             btnChangePhoto.setOnClickListener { showDialog() }
             btnCancelEdit.setOnClickListener { finish() }
             btnSaveEdit.setOnClickListener {
-                if (userId != null) {
-                    saveChanges(userId)
+                val email = binding.etEditEmail.text.trim().toString()
+                val name = binding.etEditName.text.trim().toString()
+                var address = binding.etEditAddress.text.trim().toString()
+                var phone = binding.etEditPhone.text.trim().toString()
+
+                when {
+                    name.isEmpty() -> {
+                        binding.apply {
+                            tvNameError.visibility = visible
+                            tvNameError.text = getString(R.string.no_empty_name)
+                            etEditName.requestFocus()
+                        }
+                        return@setOnClickListener
+                    }
+                    email.isEmpty() -> {
+                        binding.apply {
+                            tvEmailError.visibility = visible
+                            tvEmailError.text = getString(R.string.no_empty_email)
+                            etEditEmail.requestFocus()
+                        }
+                        return@setOnClickListener
+                    }
                 }
+
+                if (address.isEmpty()) {
+                    address = "-"
+                }
+                if (phone.isEmpty()) {
+                    phone = "-"
+                }
+
+                val userData = UserItem(
+                    "",
+                    address,
+                    userId,
+                    phone,
+                    "",
+                    name,
+                    email,
+                )
+
+                saveChanges(userId, userData)
             }
         }
 
-        binding.apply {
-            etEditEmail.setText(userData.email)
-            etEditName.setText(userData.name)
-            etEditAddress.setText(userData.address)
-            etEditPhone.setText(userData.phone)
-        }
+
     }
 
-    private fun saveChanges(id: String) {
-        val email = binding.etEditEmail.text.trim().toString()
-        val name = binding.etEditName.text.trim().toString()
-        val address = binding.etEditAddress.text.trim().toString()
-        val phone = binding.etEditPhone.text.trim().toString()
-
-        val userData = UserItem(
-            "",
-            address,
-            id,
-            phone,
-            "",
-            name,
-            email,
-        )
+    private fun saveChanges(id: String, userData: UserItem) {
         viewModel.updateUser(id, userData).observe(this) {
             when (it) {
                 is State.Success -> finish()
