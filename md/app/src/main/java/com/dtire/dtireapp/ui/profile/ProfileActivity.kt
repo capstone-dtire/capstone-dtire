@@ -45,6 +45,11 @@ class ProfileActivity : AppCompatActivity(), StateCallback<UserItem> {
             finish()
             startActivity(intent)
         }
+
+    }
+
+    override fun onResume() {
+        super.onResume()
         val userId = preference.getUserId()
         if (userId != null) {
             viewModel.getData(userId).observe(this) {
@@ -64,6 +69,7 @@ class ProfileActivity : AppCompatActivity(), StateCallback<UserItem> {
             tvProfileAddress.text = data.address ?: "-"
             tvProfilePhone.text = data.phone ?: "-"
         }
+        preference.saveUserData(data)
         val progressBar = ObjectAnimator.ofFloat(binding.profileLoading, View.ALPHA, 0f).setDuration(300)
         AnimatorSet().apply {
             play(progressBar)

@@ -29,7 +29,7 @@ data class UserItem(
 	val urlPicture: String? = null,
 
 	@field:SerializedName("name")
-	val name: String,
+	var name: String,
 
 	@field:SerializedName("email")
 	val email: String

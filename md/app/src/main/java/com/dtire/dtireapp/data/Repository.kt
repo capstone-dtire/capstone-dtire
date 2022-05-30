@@ -3,10 +3,7 @@ package com.dtire.dtireapp.data
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.dtire.dtireapp.data.response.LoginResponse
-import com.dtire.dtireapp.data.response.RegisterResponse
-import com.dtire.dtireapp.data.response.UserItem
-import com.dtire.dtireapp.data.response.UserResponse
+import com.dtire.dtireapp.data.response.*
 import com.dtire.dtireapp.data.retrofit.ApiConfig
 import com.dtire.dtireapp.data.retrofit.ApiService
 import retrofit2.Call
@@ -84,5 +81,36 @@ class Repository {
             }
         })
         return userData
+    }
+
+    fun updateUser(id: String, userData: UserItem): LiveData<State<String>> {
+        val updateStatus = MutableLiveData<State<String>>()
+
+        updateStatus.postValue(State.Loading())
+        retrofit.updateUser(id, userData.name, userData.email, userData.address ?: "", userData.phone ?: "")
+            .enqueue(object : Callback<UpdateUserResponse> {
+                override fun onResponse(
+                    call: Call<UpdateUserResponse>,
+                    response: Response<UpdateUserResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        val responseBody = response.body()
+                        if (responseBody != null) {
+                            updateStatus.postValue(State.Error(responseBody.message))
+                        } else {
+                            updateStatus.postValue(State.Success(responseBody?.message))
+                        }
+                    } else {
+                        updateStatus.postValue(State.Error(response.message()))
+                    }
+
+
+                }
+
+                override fun onFailure(call: Call<UpdateUserResponse>, t: Throwable) {
+                    updateStatus.postValue(State.Error(t.message))
+                }
+            })
+        return updateStatus
     }
 }

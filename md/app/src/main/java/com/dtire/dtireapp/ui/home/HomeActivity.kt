@@ -26,7 +26,6 @@ import com.dtire.dtireapp.R
 import com.dtire.dtireapp.data.State
 import com.dtire.dtireapp.data.preferences.UserPreference
 import com.dtire.dtireapp.data.response.UserItem
-import com.dtire.dtireapp.data.response.UserResponse
 import com.dtire.dtireapp.databinding.ActivityHomeBinding
 import com.dtire.dtireapp.ui.history.HistoryActivity
 import com.dtire.dtireapp.ui.login.LoginActivity
@@ -101,6 +100,7 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
     }
 
     override fun onSuccess(data: UserItem) {
+        preferences.saveUserData(data)
         binding.tvHomeGreeting.text = getString(R.string.user_greeting, data.name)
     }
 
@@ -115,6 +115,7 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
     override fun onResume() {
         super.onResume()
         getMyLastLocation()
+        binding.tvHomeGreeting.text = getString(R.string.user_greeting, preferences.getUserData().name)
     }
 
     override fun onStart() {
