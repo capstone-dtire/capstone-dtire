@@ -111,6 +111,14 @@ class RegisterActivity : AppCompatActivity(), StateCallback<RegisterResponse> {
             play(progressBar)
             start()
         }
+        binding.apply {
+            etRegisterName.isEnabled = false
+            etRegisterEmail.isEnabled = false
+            etRegisterPassword.isEnabled = false
+            etRegisterConfirmPassword.isEnabled = false
+            btnLogin.isClickable = false
+            btnRegister.isClickable = false
+        }
     }
 
     override fun onFailed(message: String?) {
@@ -119,6 +127,14 @@ class RegisterActivity : AppCompatActivity(), StateCallback<RegisterResponse> {
         AnimatorSet().apply {
             play(progressBar)
             start()
+        }
+        binding.apply {
+            etRegisterName.isEnabled = true
+            etRegisterEmail.isEnabled = true
+            etRegisterPassword.isEnabled = true
+            etRegisterConfirmPassword.isEnabled = true
+            btnLogin.isClickable = true
+            btnRegister.isClickable = true
         }
     }
 }
