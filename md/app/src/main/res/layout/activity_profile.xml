@@ -32,10 +32,10 @@
                 android:src="@drawable/person1" />
 
             <TextView
+                android:id="@+id/tv_user_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/user_name"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="20sp"
@@ -76,7 +76,6 @@
             android:id="@+id/tv_profile_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/email"
             android:textSize="14sp" />
     </LinearLayout>
 
@@ -102,7 +101,6 @@
             android:id="@+id/tv_profile_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/empty_string"
             android:textSize="14sp" />
     </LinearLayout>
 
@@ -126,7 +124,6 @@
             android:id="@+id/tv_profile_phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/empty_string"
             android:textSize="14sp" />
     </LinearLayout>
 
@@ -134,19 +131,37 @@
         android:id="@+id/btn_logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_corner"
+        android:backgroundTint="@color/red"
         android:minWidth="0dp"
         android:minHeight="0dp"
         android:paddingHorizontal="16dp"
         android:paddingVertical="8dp"
         android:text="@string/logout"
-        android:textColor="@color/white"
         android:textAllCaps="false"
+        android:textColor="@color/white"
         android:textStyle="bold"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/rounded_corner"
-        android:backgroundTint="@color/red"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="TouchTargetSizeCheck,TouchTargetSizeCheck" />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/profile_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_ripple"
+        android:alpha="0">
+        <ProgressBar
+            android:id="@+id/profile_progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,7 +17,7 @@ data class UserItem(
 	val password: String,
 
 	@field:SerializedName("address")
-	val address: Any,
+	val address: String? = null,
 
 	@field:SerializedName("user_id")
 	val userId: String,

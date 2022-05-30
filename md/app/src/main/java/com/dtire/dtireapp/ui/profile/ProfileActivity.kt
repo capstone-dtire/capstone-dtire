@@ -1,20 +1,29 @@
 package com.dtire.dtireapp.ui.profile
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import com.dtire.dtireapp.R
+import com.dtire.dtireapp.data.State
 import com.dtire.dtireapp.data.preferences.UserPreference
+import com.dtire.dtireapp.data.response.UserItem
 import com.dtire.dtireapp.databinding.ActivityProfileBinding
 import com.dtire.dtireapp.ui.login.LoginActivity
+import com.dtire.dtireapp.utils.StateCallback
 
-class ProfileActivity : AppCompatActivity() {
+class ProfileActivity : AppCompatActivity(), StateCallback<UserItem> {
     private lateinit var binding: ActivityProfileBinding
     private lateinit var preference: UserPreference
+    private val viewModel: ProfileViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +45,47 @@ class ProfileActivity : AppCompatActivity() {
             finish()
             startActivity(intent)
         }
+        val userId = preference.getUserId()
+        if (userId != null) {
+            viewModel.getData(userId).observe(this) {
+                when (it) {
+                    is State.Success -> it.data?.let { data -> onSuccess(data) }
+                    is State.Loading -> onLoading()
+                    is State.Error -> onFailed(it.message)
+                }
+            }
+        }
+    }
+
+    override fun onSuccess(data: UserItem) {
+        binding.apply {
+            tvUserName.text = data.name
+            tvProfileEmail.text = data.email
+            tvProfileAddress.text = data.address ?: "-"
+            tvProfilePhone.text = data.phone ?: "-"
+        }
+        val progressBar = ObjectAnimator.ofFloat(binding.profileLoading, View.ALPHA, 0f).setDuration(300)
+        AnimatorSet().apply {
+            play(progressBar)
+            start()
+        }
+    }
+
+    override fun onLoading() {
+        val progressBar = ObjectAnimator.ofFloat(binding.profileLoading, View.ALPHA, 1f).setDuration(300)
+        AnimatorSet().apply {
+            play(progressBar)
+            start()
+        }
+    }
+
+    override fun onFailed(message: String?) {
+        val progressBar = ObjectAnimator.ofFloat(binding.profileLoading, View.ALPHA, 0f).setDuration(300)
+        AnimatorSet().apply {
+            play(progressBar)
+            start()
+        }
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -58,4 +108,6 @@ class ProfileActivity : AppCompatActivity() {
             else -> true
         }
     }
+
+
 }
