@@ -148,33 +148,6 @@ describe('GET /api/user/:user_id', () => {
     });
 });
 
-// Test the GET route for '/api/user_details/:user_id'
-describe('GET /api/user_details/:user_id with nonexistent id', () => {
-    // It should return a status code of 404
-    it('should return a status code of 404', (done) => {
-        chai.request(server)
-            .get('/api/user_details/' + '123')
-            .end((err, res) => {
-                res.should.have.status(404);
-                done();
-            });
-    });
-});
-
-// Test the GET route for '/api/user_details/:user_id'
-describe('GET /api/user_details/:user_id', () => {
-    // user_id is from the previous test
-    // It should return a status code of 200
-    it('should return a status code of 200', (done) => {
-        chai.request(server)
-            .get('/api/user_details/' + user_id)
-            .end((err, res) => {
-                res.should.have.status(200);
-                done();
-            });
-    });
-});
-
 // Test the PUT route for '/api/user/:user_id'
 describe('PUT /api/user/:user_id with nonexistent id', () => {
     // It should return a status code of 404
@@ -197,38 +170,9 @@ describe('PUT /api/user/:user_id', () => {
             .put('/api/user/' + user_id)
             .send({
                 name: 'Doe John',
-                email: 'johndoe@yahoo.com'
-            })
-            .end((err, res) => {
-                res.should.have.status(204);
-                done();
-            });
-    });
-});
-
-// Test the PUT route for '/api/user_details/:user_id'
-describe('PUT /api/user_details/:user_id with nonexistent id', () => {
-    // It should return a status code of 404
-    it('should return a status code of 404', (done) => {
-        chai.request(server)
-            .put('/api/user_details/' + '123')
-            .end((err, res) => {
-                res.should.have.status(404);
-                done();
-            });
-    });
-});
-
-// Test the PUT route for '/api/user_details/:user_id'
-describe('PUT /api/user_details/:user_id', () => {
-    // user_id is from the previous test
-    // It should return a status code of 204
-    it('should return a status code of 204', (done) => {
-        chai.request(server)
-            .put('/api/user_details/' + user_id)
-            .send({
+                email: 'johndoe@yahoo.com',
                 address: '123 Main St',
-                phone: '123-456-7890'
+                phone: '1234567890'
             })
             .end((err, res) => {
                 res.should.have.status(204);
