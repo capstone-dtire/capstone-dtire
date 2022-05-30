@@ -25,6 +25,7 @@ import androidx.core.content.FileProvider
 import com.dtire.dtireapp.R
 import com.dtire.dtireapp.data.State
 import com.dtire.dtireapp.data.preferences.UserPreference
+import com.dtire.dtireapp.data.response.UserItem
 import com.dtire.dtireapp.data.response.UserResponse
 import com.dtire.dtireapp.databinding.ActivityHomeBinding
 import com.dtire.dtireapp.ui.history.HistoryActivity
@@ -41,7 +42,7 @@ import java.io.File
 import java.util.*
 
 
-class HomeActivity : AppCompatActivity(), StateCallback<UserResponse> {
+class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var currentPhotoPath: String
     private lateinit var preferences: UserPreference
@@ -91,7 +92,7 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserResponse> {
         if (userId != null) {
             viewModel.getUser(userId).observe(this) {
                 when(it) {
-                    is State.Success -> it.data?.let { userData -> onSuccess(userData) }
+                    is State.Success -> it.data?.let { data -> onSuccess(data) }
                     is State.Error -> onFailed(it.message)
                     is State.Loading -> onLoading()
                 }
@@ -99,8 +100,8 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserResponse> {
         }
     }
 
-    override fun onSuccess(data: UserResponse) {
-        binding.tvHomeGreeting.text = getString(R.string.user_greeting, data.user.name)
+    override fun onSuccess(data: UserItem) {
+        binding.tvHomeGreeting.text = getString(R.string.user_greeting, data.name)
     }
 
     override fun onLoading() {
@@ -292,7 +293,4 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserResponse> {
         )
         private const val REQUEST_CODE_PERMISSIONS = 10
     }
-
-
-
 }

@@ -1,9 +1,11 @@
 package com.dtire.dtireapp.data
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.dtire.dtireapp.data.response.LoginResponse
 import com.dtire.dtireapp.data.response.RegisterResponse
+import com.dtire.dtireapp.data.response.UserItem
 import com.dtire.dtireapp.data.response.UserResponse
 import com.dtire.dtireapp.data.retrofit.ApiConfig
 import com.dtire.dtireapp.data.retrofit.ApiService
@@ -62,13 +64,13 @@ class Repository {
         return registeredUser
     }
 
-    fun getUser(id: String): LiveData<State<UserResponse>> {
-        val userData = MutableLiveData<State<UserResponse>>()
+    fun getUser(id: String): LiveData<State<UserItem>> {
+        val userData = MutableLiveData<State<UserItem>>()
 
         userData.postValue(State.Loading())
         retrofit.getUser(id).enqueue(object : Callback<UserResponse> {
             override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
-                val userResponse = response.body()
+                val userResponse = response.body()?.user?.get(0)
                 if (userResponse != null) {
                     userData.postValue(State.Success(userResponse))
                 } else {
@@ -78,6 +80,7 @@ class Repository {
 
             override fun onFailure(call: Call<UserResponse>, t: Throwable) {
                 userData.postValue(State.Error(t.message))
+                Log.d("TAG", "onFailure: ${t.message}")
             }
         })
         return userData
