@@ -94,6 +94,12 @@ class LoginActivity : AppCompatActivity(), StateCallback<LoginResponse> {
             play(progressBar)
             start()
         }
+        binding.apply {
+            etLoginEmail.isEnabled = true
+            etLoginPassword.isEnabled = true
+            btnLogin.isClickable = true
+            btnRegister.isClickable = true
+        }
     }
 
     override fun onLoading() {
@@ -101,6 +107,12 @@ class LoginActivity : AppCompatActivity(), StateCallback<LoginResponse> {
         AnimatorSet().apply {
             play(progressBar)
             start()
+        }
+        binding.apply {
+            etLoginEmail.isEnabled = false
+            etLoginPassword.isEnabled = false
+            btnLogin.isClickable = false
+            btnRegister.isClickable = false
         }
     }
 

@@ -6,7 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object BaseUrl {
-    var BASE_URL = "http://34.135.121.191/api/"
+    var BASE_URL = "http://35.208.190.49/api/"
 }
 
 class ApiConfig {

@@ -16,19 +16,23 @@ import android.view.*
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.dtire.dtireapp.R
+import com.dtire.dtireapp.data.State
 import com.dtire.dtireapp.data.preferences.UserPreference
+import com.dtire.dtireapp.data.response.UserItem
 import com.dtire.dtireapp.databinding.ActivityHomeBinding
 import com.dtire.dtireapp.ui.history.HistoryActivity
 import com.dtire.dtireapp.ui.login.LoginActivity
 import com.dtire.dtireapp.ui.map.MapsActivity
 import com.dtire.dtireapp.ui.profile.ProfileActivity
 import com.dtire.dtireapp.ui.result.ResultActivity
+import com.dtire.dtireapp.utils.StateCallback
 import com.dtire.dtireapp.utils.createTempFile
 import com.dtire.dtireapp.utils.uriToFile
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -37,12 +41,13 @@ import java.io.File
 import java.util.*
 
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var currentPhotoPath: String
     private lateinit var preferences: UserPreference
     private var getFile: File? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val viewModel: HomeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,11 +86,36 @@ class HomeActivity : AppCompatActivity() {
             }
             btnHomeRefresh.setOnClickListener { getMyLastLocation() }
         }
+
+        val userId = preferences.getUserId()
+        if (userId != null) {
+            viewModel.getUser(userId).observe(this) {
+                when(it) {
+                    is State.Success -> it.data?.let { data -> onSuccess(data) }
+                    is State.Error -> onFailed(it.message)
+                    is State.Loading -> onLoading()
+                }
+            }
+        }
+    }
+
+    override fun onSuccess(data: UserItem) {
+        preferences.saveUserData(data)
+        binding.tvHomeGreeting.text = getString(R.string.user_greeting, data.name)
+    }
+
+    override fun onLoading() {
+        binding.tvHomeGreeting.text = getString(R.string.loading)
+    }
+
+    override fun onFailed(message: String?) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {
         super.onResume()
         getMyLastLocation()
+        binding.tvHomeGreeting.text = getString(R.string.user_greeting, preferences.getUserData().name)
     }
 
     override fun onStart() {
@@ -264,5 +294,4 @@ class HomeActivity : AppCompatActivity() {
         )
         private const val REQUEST_CODE_PERMISSIONS = 10
     }
-
 }

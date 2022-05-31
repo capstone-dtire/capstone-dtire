@@ -2,10 +2,10 @@ package com.dtire.dtireapp.data.retrofit
 
 import com.dtire.dtireapp.data.response.LoginResponse
 import com.dtire.dtireapp.data.response.RegisterResponse
+import com.dtire.dtireapp.data.response.UpdateUserResponse
+import com.dtire.dtireapp.data.response.UserResponse
 import retrofit2.Call
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface ApiService {
     @FormUrlEncoded
@@ -22,4 +22,19 @@ interface ApiService {
         @Field("email") email: String,
         @Field("password") password: String,
     ): Call<RegisterResponse>
+
+    @GET("user/{id}")
+    fun getUser(
+        @Path("id") id: String,
+    ) : Call<UserResponse>
+
+    @FormUrlEncoded
+    @PUT("user/{id}")
+    fun updateUser(
+        @Path("id") id: String,
+        @Field("name") name: String,
+        @Field("email") email: String,
+        @Field("address") address: String,
+        @Field("phone") phone: String,
+    ): Call<UpdateUserResponse>
 }
