@@ -4,7 +4,7 @@
 This is a cloud function that is triggered by a HTTP request. We're using it because the endpoint for Vertex AI is not public.
 
 ## Okay, how'd it work?
-The cloud function is triggered by a HTTP request. It's a POST request with a JSON body. The example JSON body contains the following fields:
+The cloud function is triggered by a HTTP request. The cloud function will generate a token which then will be used to call the ML endpoint. Make sure to use a POST request with a JSON body. The example JSON body contains the following fields:
 
     {
         "instances": [
@@ -37,17 +37,13 @@ After sending a request to the cloud function, it will return a JSON response wi
     }
 
 ## Guide to test on local machine
-1. ```npm install```
-2. ```set GOOGLE_APPLICATION_CREDENTIALS=<path-to-the-service-account-key-file>```
-3. ```npm start```
-4. Go to localhost:8080 and send a request to the endpoint (Use the example)
+1. ```pip install -r requirements.txt```
+2. Make sure you have a service account key file in the same directory as this file.
+3. ```set GOOGLE_APPLICATION_CREDENTIALS=<path to service account key file>```
+4. ```functions-framework-python --target reqPred --debug```
 
 ## Todo
-- Solve this issue:
-
-    ```Exception from a finished function: Error: 3 INVALID_ARGUMENT: Failed to parse input instances.```
-
-    The above error is happened after using the cloud function. It seemed that the request body for the cloud function is still wrong.
+- Filter the predictions to show the qualitative predictions based on the threshold.
 
 ## Author
 Allief Nuriman
