@@ -43,7 +43,7 @@ After sending a request to the cloud function, it will return a JSON response wi
 4. ```functions-framework-python --target reqPred --debug```
 
 ## Todo
-- Filter the predictions to show the qualitative predictions based on the threshold.
+- NOTHING! :D
 
 ## Author
 Allief Nuriman
