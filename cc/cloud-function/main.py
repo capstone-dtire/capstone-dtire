@@ -31,8 +31,5 @@ def reqPred(request):
 
     response = requests.post(
         'https://us-central1-aiplatform.googleapis.com/v1/projects/evident-plane-343600/locations/us-central1/endpoints/4805507928171741184:predict', headers=headers, json=json_data)
-    
-    # Revoke token (creds.token)
-    creds.revoke(auth_req)
 
     return response.json()
