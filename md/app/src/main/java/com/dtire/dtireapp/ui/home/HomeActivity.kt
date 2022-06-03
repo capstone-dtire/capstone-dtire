@@ -3,15 +3,19 @@ package com.dtire.dtireapp.ui.home
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.location.Geocoder
 import android.location.Location
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -68,6 +72,7 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
 
         preferences = UserPreference(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
         getMyLastLocation()
 
         binding.apply {
@@ -77,14 +82,26 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
             }
             layoutHomeToCamera.setOnClickListener { showDialog() }
             layoutHomeToMap.setOnClickListener {
-                val intent = Intent(this@HomeActivity, MapsActivity::class.java)
-                startActivity(intent)
+                if (isOnline(this@HomeActivity)) {
+                    val intent = Intent(this@HomeActivity, MapsActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    binding.apply {
+                        layoutHome.visibility = invisible
+                        layoutNoConnection.visibility = visible
+                    }
+                }
             }
             layoutHomeToHistory.setOnClickListener {
                 val intent = Intent(this@HomeActivity, HistoryActivity::class.java)
                 startActivity(intent)
             }
             btnHomeRefresh.setOnClickListener { getMyLastLocation() }
+            btnRefreshInternet.setOnClickListener {
+                val intent = Intent(this@HomeActivity, HomeActivity::class.java)
+                finish()
+                startActivity(intent)
+            }
         }
 
         val userId = preferences.getUserId()
@@ -112,7 +129,6 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
 
     override fun onResume() {
         super.onResume()
-        getMyLastLocation()
         binding.tvHomeGreeting.text = getString(R.string.user_greeting, preferences.getUserData().name)
     }
 
@@ -154,29 +170,37 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
 
     @SuppressLint("MissingPermission")
     private fun getMyLastLocation() {
-        if     (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
-            checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-        ){
-            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                if (location != null) {
-                    val city = getCityName(location.latitude, location.longitude)
-                    binding.tvHomeLocation.text = city
-                } else {
-                    Toast.makeText(
-                        this@HomeActivity,
-                        "Location is not found. Try Again",
-                        Toast.LENGTH_SHORT
-                    ).show()
+        if (isOnline(this@HomeActivity)) {
+            if     (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
+                checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+            ){
+                fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                    if (location != null) {
+                        val city = getCityName(location.latitude, location.longitude)
+                        binding.tvHomeLocation.text = city
+                    } else {
+                        Toast.makeText(
+                            this@HomeActivity,
+                            "Location is not found. Try Again",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
+            } else {
+                locationRequestPermissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                )
             }
         } else {
-            locationRequestPermissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
+            binding.apply {
+                layoutHome.visibility = invisible
+                layoutNoConnection.visibility = visible
+            }
         }
+
     }
 
     private fun getCityName(lat: Double, lng: Double): String {
@@ -213,6 +237,33 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
             dialog.dismiss()
         }
     }
+
+    @SuppressLint("MissingPermission")
+    fun isOnline(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+        if (capabilities != null) {
+            when {
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
+                    Log.d("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
+                    return true
+                }
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
+                    Log.d("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
+                    return true
+                }
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> {
+                    Log.d("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
+                    return true
+                }
+            }
+        }
+        Log.d("Internet", "NetworkCapabilities.NO_CONNECTION")
+        return false
+    }
+
 
     private fun startCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -288,7 +339,8 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
         private val REQUIRED_PERMISSIONS = arrayOf(
             Manifest.permission.CAMERA,
             Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_NETWORK_STATE
         )
         private const val REQUEST_CODE_PERMISSIONS = 10
     }
