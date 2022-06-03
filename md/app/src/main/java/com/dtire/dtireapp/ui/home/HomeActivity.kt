@@ -88,13 +88,11 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
         }
 
         val userId = preferences.getUserId()
-        if (userId != null) {
-            viewModel.getUser(userId).observe(this) {
-                when(it) {
-                    is State.Success -> it.data?.let { data -> onSuccess(data) }
-                    is State.Error -> onFailed(it.message)
-                    is State.Loading -> onLoading()
-                }
+        viewModel.getUser(userId).observe(this) {
+            when(it) {
+                is State.Success -> it.data?.let { data -> onSuccess(data) }
+                is State.Error -> onFailed(it.message)
+                is State.Loading -> onLoading()
             }
         }
     }
