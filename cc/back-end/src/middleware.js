@@ -359,18 +359,15 @@ function getDetectionHistory(req, res) {
 }
 
 async function uploadTire(req, res) {
-    console.log("Halo");
     try {
         await processFile(req, res);
-        // print the file name
-        console.log("Halo");
-        console.log("File name: " + req.file.filename);
-        console.log(req.file.filename);
         if (!req.file) {
             return res.status(400).send({ message: "Please upload a file!" });
         }
         // Create a new blob in the bucket and upload the file data.
         const blob = bucket.file(req.file.originalname);
+        // Change blob name to the timestamp and the original file name
+        blob.name = `${Date.now()}-${req.file.originalname}`;
         const blobStream = blob.createWriteStream({
             resumable: false,
         });
@@ -384,7 +381,7 @@ async function uploadTire(req, res) {
             );
             try {
                 // Make the file public
-                await bucket.file(req.file.originalname).makePublic();
+                await bucket.file(blob.name).makePublic();
             } catch {
                 return res.status(500).send({
                     message:
