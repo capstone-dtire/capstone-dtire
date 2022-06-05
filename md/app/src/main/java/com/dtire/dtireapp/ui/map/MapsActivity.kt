@@ -10,8 +10,10 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.dtire.dtireapp.R
 import com.dtire.dtireapp.data.State
 import com.dtire.dtireapp.data.response.MapsResponse
@@ -26,6 +28,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,6 +39,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, StateCallback<Any>
     private lateinit var binding: ActivityMapsBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var googlePlaceList: ArrayList<ResultsItem>
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private val viewModel: MapsViewModel by viewModels()
     private var lat: Double = 0.0
     private var lng: Double = 0.0
@@ -50,10 +54,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, StateCallback<Any>
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.mapBottomSheet)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         googlePlaceList = ArrayList()
         getMyLastLocation()
+
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -64,6 +71,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, StateCallback<Any>
         mMap.uiSettings.isCompassEnabled = true
         mMap.uiSettings.isMapToolbarEnabled = true
 
+        mMap.setOnMapClickListener {
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
     }
 
     private fun getNearbyPlace() {
@@ -122,6 +133,49 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, StateCallback<Any>
             .title(locationData.name)
 
         mMap.addMarker(markerOptions)?.tag = position
+        val prop = applicationContext.packageManager.getApplicationInfo(
+            applicationContext.packageName, PackageManager.GET_META_DATA
+        )
+        val bundle = Bundle(prop.metaData)
+        val api = bundle.getString("com.google.android.geo.API_KEY")
+        mMap.setOnMarkerClickListener { p0 ->
+            val result = googlePlaceList[p0.tag as Int]
+            binding.tvRepairShopName.text = result.name.toString()
+
+            if (result.photos != null) {
+                val photoUrl =
+                    "https://maps.googleapis.com/maps/api/place/photo?photoreference=${result.photos[0]?.photoReference}&sensor=false&maxheight=500&maxwidth=500&key=${api}"
+                Glide.with(applicationContext)
+                    .load(photoUrl)
+                    .into(binding.ivRepairShop)
+            } else {
+                binding.ivRepairShop.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        this@MapsActivity,
+                        R.drawable.ic_baseline_image_not_supported_24
+                    )
+                )
+            }
+
+            if (result.openingHours != null) {
+                if (result.openingHours.openNow == true) {
+                    binding.tvRepairShopStatus.apply {
+                        text = context.getString(R.string.open)
+                        setTextColor(resources.getColor(R.color.primary_green))
+                    }
+                } else {
+                    binding.tvRepairShopStatus.apply {
+                        text = context.getString(R.string.closed)
+                        setTextColor(resources.getColor(R.color.red))
+                    }
+                }
+            }
+
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED)
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            true
+        }
+
     }
 
     @SuppressLint("MissingPermission")
