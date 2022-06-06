@@ -40,7 +40,7 @@ After sending a request to the cloud function, it will return a JSON response wi
 1. ```pip install -r requirements.txt```
 2. Make sure you have a service account key file in the same directory as this file.
 3. ```set GOOGLE_APPLICATION_CREDENTIALS=<path to service account key file>```
-4. ```functions-framework-python --target reqPred --debug```
+4. ```functions-framework-python --target process --debug```
 
 ## List of Cloud Functions
 1. pred: This is used to predict the image, it will take a url, preprocess the image, and then send it to the ML endpoint.
