@@ -42,6 +42,11 @@ After sending a request to the cloud function, it will return a JSON response wi
 3. ```set GOOGLE_APPLICATION_CREDENTIALS=<path to service account key file>```
 4. ```functions-framework-python --target reqPred --debug```
 
+## List of Cloud Functions
+1. pred: This is used to predict the image, it will take a url, preprocess the image, and then send it to the ML endpoint.
+2. startInstancePubSub: This is used to start a VM instance in the cloud.
+3. stopInstancePubSub: This is used to stop a VM instance in the cloud.
+
 ## Todo
 - NOTHING! :D
 

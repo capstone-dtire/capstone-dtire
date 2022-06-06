@@ -4,9 +4,11 @@ from PIL import Image
 import json
 import PIL.Image
 import numpy as np
+import google.auth
+import google.auth.transport.requests
+import requests
 
-
-def preprocess(request):
+def process(request):
     """Responds to any HTTP request.
     Args:
         request (flask.Request): HTTP request object.
@@ -48,4 +50,22 @@ def preprocess(request):
     img_arr_p[..., 2] -= mean[2]
     img_arr_p_json = json.dumps(img_arr_p.tolist())
     json_str = '{"instances":' + img_arr_p_json + '}'
-    return json_str
+
+    creds, project = google.auth.default()
+
+    # creds.valid is False, and creds.token is None
+    # Need to refresh credentials to populate those
+
+    auth_req = google.auth.transport.requests.Request()
+    creds.refresh(auth_req)
+
+    headers = {
+        'Authorization': "Bearer " + creds.token
+        # Already added when you pass json= but not when you pass data=
+        # 'Content-Type': 'application/json',
+    }
+
+    response = requests.post(
+        'https://us-central1-aiplatform.googleapis.com/v1/projects/evident-plane-343600/locations/us-central1/endpoints/4805507928171741184:predict', headers=headers, json=json.loads(json_str))
+
+    return response.json()
