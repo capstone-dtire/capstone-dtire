@@ -1,6 +1,7 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../src/app');
+const db = require('../src/config/database')
 
 chai.use(chaiHttp);
 chai.should();
@@ -243,18 +244,11 @@ describe('GET /api/detection_history/:user_id', () => {
 });
 
 // TESTS CLEANUP
-// Use .env to connect to the database and delete the user
-const pgp = require('pg-promise')();
-require('dotenv').config();
-const db = pgp(process.env.DATABASE_URL);
-
 // Delete the user with the db connection: email 'johndoe@gmail.com'
 describe('Deleting all tests data...', () => {
     it('Deleting all tests data...', (done) => {
         db.none('DELETE FROM public.user WHERE user_id = $1', user_id)
             .then(() => {
-                // Close the db connection
-                pgp.end();
                 done();
             });
     });
