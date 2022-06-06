@@ -1,6 +1,7 @@
 import google.auth
 import google.auth.transport.requests
 import requests
+import json
 
 
 def reqPred(request):
@@ -27,9 +28,14 @@ def reqPred(request):
         # 'Content-Type': 'application/json',
     }
 
-    json_data = request.get_json()
+    # json_data = request.get_json()
+    form_data = request.form
+
+    # Convert to JSON
+    instances = form_data['instances']
+    json_data = '{"instances":' + instances + '}'
 
     response = requests.post(
-        'https://us-central1-aiplatform.googleapis.com/v1/projects/evident-plane-343600/locations/us-central1/endpoints/4805507928171741184:predict', headers=headers, json=json_data)
+        'https://us-central1-aiplatform.googleapis.com/v1/projects/evident-plane-343600/locations/us-central1/endpoints/4805507928171741184:predict', headers=headers, json=json.loads(json_data))
 
     return response.json()
