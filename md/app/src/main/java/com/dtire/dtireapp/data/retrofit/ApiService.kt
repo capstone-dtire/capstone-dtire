@@ -42,6 +42,15 @@ interface ApiService {
     fun uploadPhoto(
         @Part file: MultipartBody.Part
     ): Call<UploadPhotoResponse>
+
+    @FormUrlEncoded
+    @POST("detection_history")
+    fun addToHistory(
+        @Field("user_id") id: String,
+        @Field("condition_title") conditionTitle: String,
+        @Field("recommendation") recommendation: String,
+        @Field("image_url") imageUrl: String,
+    ): Call<HistorySuccessResponse>
 }
 
 interface MapsApiService {

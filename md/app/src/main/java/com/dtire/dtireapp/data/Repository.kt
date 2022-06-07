@@ -136,4 +136,34 @@ class Repository {
         emit(State.Error(it.message))
         Log.d("TAG", "getNearbyPlaces: gagal2 : ${it.message}")
     }.flowOn(Dispatchers.IO)
+
+    fun addToHistory(id: String,
+                     condition: String,
+                     recommendation: String,
+                     imageUrl: String): LiveData<State<HistorySuccessResponse>> {
+        val history = MutableLiveData<State<HistorySuccessResponse>>()
+
+        retrofit.addToHistory(id, condition, recommendation, imageUrl)
+            .enqueue(object : Callback<HistorySuccessResponse> {
+                override fun onResponse(
+                    call: Call<HistorySuccessResponse>,
+                    response: Response<HistorySuccessResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        history.postValue(State.Success(response.body()))
+                        Log.d("TAG", "onResponse: ${response.body()}")
+                    } else {
+                        history.postValue(State.Error(response.message()))
+                        Log.d("TAG", "onResponseFailed1: ${response.body()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<HistorySuccessResponse>, t: Throwable) {
+                    history.postValue(State.Error(t.message))
+                    Log.d("TAG", "onFailed1: ${t.message}")
+                }
+
+            })
+        return history
+    }
 }

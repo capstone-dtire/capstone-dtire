@@ -4,14 +4,25 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import com.bumptech.glide.Glide
 import com.dtire.dtireapp.R
+import com.dtire.dtireapp.data.State
+import com.dtire.dtireapp.data.preferences.UserPreference
+import com.dtire.dtireapp.data.response.HistorySuccessResponse
 import com.dtire.dtireapp.databinding.ActivityResultBinding
 import com.dtire.dtireapp.ui.home.HomeActivity
+import com.dtire.dtireapp.utils.StateCallback
 
-class ResultActivity : AppCompatActivity() {
+class ResultActivity : AppCompatActivity(), StateCallback<HistorySuccessResponse> {
     private lateinit var binding: ActivityResultBinding
+    private val viewModel: ResultViewModel by viewModels()
+    private var condition: String = ""
+    private var recommendation: String = ""
+    private lateinit var preferences: UserPreference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityResultBinding.inflate(layoutInflater)
@@ -21,20 +32,6 @@ class ResultActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-//        val picturePath = intent.getStringExtra(EXTRA_IMAGE)
-//        val result = BitmapFactory.decodeFile(picturePath)
-
-//        binding.ivResultPicture.setImageBitmap(result)
-//        binding.ivResultPicture.setOnClickListener {
-//            val optionsCompat: ActivityOptionsCompat =
-//                ActivityOptionsCompat.makeSceneTransitionAnimation(
-//                    this, binding.ivResultPicture, "detail_image"
-//                )
-//            val intent = Intent(this@ResultActivity, ImageDetailActivity::class.java)
-//            intent.putExtra(ImageDetailActivity.EXTRA_IMAGE, picturePath)
-//            startActivity(intent, optionsCompat.toBundle())
-//        }
-
         val imageUrl = intent.getStringExtra(EXTRA_IMAGE_URL)
         Glide.with(this)
             .load(imageUrl)
@@ -43,13 +40,29 @@ class ResultActivity : AppCompatActivity() {
         val result = intent.getDoubleExtra(EXTRA_IMAGE_RESULT, 0.0)
         if (result <= 0.5) {
             binding.apply {
+                condition = "crack"
+                recommendation = getString(R.string.result_crack)
                 tvResultTitle.text = getString(R.string.result)
                 tvResultDetail.text = getString(R.string.result_crack)
             }
         } else {
             binding.apply {
+                condition = "ok"
+                recommendation = getString(R.string.result_ok)
                 tvResultTitle.text = getString(R.string.result)
                 tvResultDetail.text = getString(R.string.result_ok)
+            }
+        }
+
+        preferences = UserPreference(this)
+        val id = preferences.getUserId()
+        if (imageUrl != null) {
+            viewModel.addToHistory(id, condition, recommendation, imageUrl).observe(this) {
+                when(it) {
+                    is State.Success -> it.data?.let { data -> onSuccess(data) }
+                    is State.Loading -> onLoading()
+                    is State.Error -> onFailed(it.message)
+                }
             }
         }
     }
@@ -70,6 +83,18 @@ class ResultActivity : AppCompatActivity() {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onSuccess(data: HistorySuccessResponse) {
+
+    }
+
+    override fun onLoading() {
+
+    }
+
+    override fun onFailed(message: String?) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     companion object {
