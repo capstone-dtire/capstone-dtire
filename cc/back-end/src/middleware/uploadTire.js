@@ -37,7 +37,7 @@ async function uploadTire(req, res) {
                     url: publicUrl,
                 });
             }
-            res.status(200).send({
+            res.status(201).send({
                 message: "Uploaded the file successfully: " + req.file.originalname,
                 url: publicUrl,
             });

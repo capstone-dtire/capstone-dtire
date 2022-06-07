@@ -1,7 +1,8 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../src/app');
-const db = require('../src/config/database')
+const db = require('../src/config/database');
+const fs = require('fs');
 
 chai.use(chaiHttp);
 chai.should();
@@ -238,6 +239,20 @@ describe('GET /api/detection_history/:user_id', () => {
                 res.should.have.status(200);
                 // Count the detection_history part of the response
                 res.body.detection_history.length.should.be.above(0);
+                done();
+            });
+    });
+});
+
+// Upload file assets/img.jpg with multipart/form-data to POST route for '/api/upload-tire'
+describe('POST /api/upload-tire', () => {
+    // It should return a status code of 201
+    it('should return a status code of 201', (done) => {
+        chai.request(server)
+            .post('/api/upload-tire')
+            .attach('file', fs.readFileSync('./tests/assets/img.jpg'), 'img.jpg')
+            .end((err, res) => {
+                res.should.have.status(201);
                 done();
             });
     });
