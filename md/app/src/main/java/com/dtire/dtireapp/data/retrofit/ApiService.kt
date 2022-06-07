@@ -1,6 +1,7 @@
 package com.dtire.dtireapp.data.retrofit
 
 import com.dtire.dtireapp.data.response.*
+import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
@@ -35,6 +36,12 @@ interface ApiService {
         @Field("address") address: String,
         @Field("phone") phone: String,
     ): Call<UpdateUserResponse>
+
+    @Multipart
+    @POST("upload-tire")
+    fun uploadPhoto(
+        @Part file: MultipartBody.Part
+    ): Call<UploadPhotoResponse>
 }
 
 interface MapsApiService {
@@ -42,4 +49,11 @@ interface MapsApiService {
     suspend fun getNearbyPlaces(
         @Url url: String
     ): Response<MapsResponse>
+}
+
+interface UploadImageApiService {
+    @POST("pred")
+    fun uploadImageToCloudFunc(
+        @Query("url") url: String
+    ): Call<ImageResultResponse>
 }

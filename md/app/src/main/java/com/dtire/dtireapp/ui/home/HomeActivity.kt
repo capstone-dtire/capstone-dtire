@@ -1,11 +1,15 @@
 package com.dtire.dtireapp.ui.home
 
 import android.Manifest
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.location.Geocoder
@@ -29,7 +33,10 @@ import androidx.core.content.FileProvider
 import com.dtire.dtireapp.R
 import com.dtire.dtireapp.data.State
 import com.dtire.dtireapp.data.preferences.UserPreference
+import com.dtire.dtireapp.data.response.ImageResultResponse
+import com.dtire.dtireapp.data.response.UploadPhotoResponse
 import com.dtire.dtireapp.data.response.UserItem
+import com.dtire.dtireapp.data.retrofit.ApiConfig
 import com.dtire.dtireapp.databinding.ActivityHomeBinding
 import com.dtire.dtireapp.ui.history.HistoryActivity
 import com.dtire.dtireapp.ui.login.LoginActivity
@@ -41,7 +48,15 @@ import com.dtire.dtireapp.utils.createTempFile
 import com.dtire.dtireapp.utils.uriToFile
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
 
@@ -69,6 +84,8 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
                 REQUEST_CODE_PERMISSIONS
             )
         }
+
+        isUploadLoading(false)
 
         preferences = UserPreference(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -123,6 +140,7 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
         binding.tvHomeGreeting.text = getString(R.string.loading)
     }
 
+
     override fun onFailed(message: String?) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
@@ -140,6 +158,24 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             finish()
             startActivity(intent)
+        }
+    }
+
+    private fun isUploadLoading(status: Boolean) {
+        if (status) {
+            val progressBar = ObjectAnimator.ofFloat(binding.homeLoading, View.ALPHA, 1f).setDuration(300)
+            AnimatorSet().apply {
+                play(progressBar)
+                start()
+            }
+            binding.layoutHome.visibility = invisible
+        } else {
+            val progressBar = ObjectAnimator.ofFloat(binding.homeLoading, View.ALPHA, 0f).setDuration(300)
+            AnimatorSet().apply {
+                play(progressBar)
+                start()
+            }
+            binding.layoutHome.visibility = visible
         }
     }
 
@@ -264,7 +300,6 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
         return false
     }
 
-
     private fun startCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         intent.resolveActivity(packageManager)
@@ -288,15 +323,93 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
         launcherIntentGallery.launch(chooser)
     }
 
+    private fun uploadPhoto() {
+        if (getFile != null) {
+            val file = reduceFileImage(getFile as File)
+            val requestImageFile = file.asRequestBody("image/jpeg".toMediaType())
+            val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData(
+                "file",
+                file.name,
+                requestImageFile
+            )
+//            imageToCloudFunc("https://images.simpletire.com/image/upload/v1600461522/learn-blog/Cracked_and_Dangerous_Tires.jpg")
+            isUploadLoading(true)
+            ApiConfig.getApiService().uploadPhoto(imageMultipart)
+                .enqueue(object : Callback<UploadPhotoResponse> {
+                    override fun onResponse(
+                        call: Call<UploadPhotoResponse>,
+                        response: Response<UploadPhotoResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            imageToCloudFunc(response.body()?.url.toString())
+                        } else {
+                            Log.d("TAGG", "onResponseGagal1: ${response.message()}")
+                        }
+                    }
+
+                    override fun onFailure(call: Call<UploadPhotoResponse>, t: Throwable) {
+                        Log.d("TAGG", "onResponseGagal2: ${t.message}")
+                    }
+
+                })
+            }
+
+    }
+
+    private fun imageToCloudFunc(url: String) {
+        ApiConfig.getUploadImageApiService().uploadImageToCloudFunc(url)
+            .enqueue(object : Callback<ImageResultResponse> {
+                override fun onResponse(
+                    call: Call<ImageResultResponse>,
+                    response: Response<ImageResultResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        Log.d("TAGG", "onResponseBerhasil: ${response.body()?.predictions?.get(0)}")
+                        val intent = Intent(this@HomeActivity, ResultActivity::class.java)
+                        intent.putExtra(ResultActivity.EXTRA_IMAGE_RESULT,
+                            response.body()?.predictions?.get(0)?.get(0)
+                        )
+                        intent.putExtra(ResultActivity.EXTRA_ORIGIN, "home")
+                        intent.putExtra(ResultActivity.EXTRA_IMAGE_URL, url)
+                        finish()
+                        startActivity(intent)
+                    } else {
+                        Log.d("TAGG", "onResponseFailed3: ${response.message()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<ImageResultResponse>, t: Throwable) {
+                    Log.d("TAGG", "onFailed4: ${t.message}")
+                }
+
+            })
+    }
+
+    private fun reduceFileImage(file: File): File {
+        val bitmap = BitmapFactory.decodeFile(file.path)
+        var compressQuality = 100
+        var streamLength: Int
+        do {
+            val bmpStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, compressQuality, bmpStream)
+            val bmpPicByteArray = bmpStream.toByteArray()
+            streamLength = bmpPicByteArray.size
+            compressQuality -= 5
+        } while (streamLength > 1000000)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, compressQuality, FileOutputStream(file))
+        return file
+    }
+
     private val launcherIntentCamera = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
         if (it.resultCode == RESULT_OK) {
             val myFile = File(currentPhotoPath)
             getFile = myFile
-            val intent = Intent(this@HomeActivity, ResultActivity::class.java)
-            intent.putExtra(ResultActivity.EXTRA_IMAGE, myFile.path)
-            startActivity(intent)
+//            val intent = Intent(this@HomeActivity, ResultActivity::class.java)
+//            intent.putExtra(ResultActivity.EXTRA_IMAGE, myFile.path)
+            uploadPhoto()
+//            startActivity(intent)
         }
     }
 
@@ -307,9 +420,10 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
             val selectedImg: Uri = result.data?.data as Uri
             val myFile = uriToFile(selectedImg, this@HomeActivity)
             getFile = myFile
-            val intent = Intent(this@HomeActivity, ResultActivity::class.java)
-            intent.putExtra(ResultActivity.EXTRA_IMAGE, myFile.path)
-            startActivity(intent)
+//            val intent = Intent(this@HomeActivity, ResultActivity::class.java)
+//            intent.putExtra(ResultActivity.EXTRA_IMAGE, myFile.path)
+//            startActivity(intent)
+            uploadPhoto()
         }
     }
 

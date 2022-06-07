@@ -8,6 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object BaseUrl {
     const val BASE_URL = "http://35.208.190.49/api/"
     const val BASE_MAPS_URL = "https://maps.googleapis.com/"
+    const val BASE_UPLOAD_IMAGE_URL = "https://us-central1-evident-plane-343600.cloudfunctions.net/"
 }
 
 class ApiConfig {
@@ -38,6 +39,20 @@ class ApiConfig {
                 .client(client)
                 .build()
             return retrofit.create(MapsApiService::class.java)
+        }
+
+        fun getUploadImageApiService(): UploadImageApiService {
+            val loggingInterceptor =
+                HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+            val client = OkHttpClient.Builder()
+                .addInterceptor(loggingInterceptor)
+                .build()
+            val retrofit = Retrofit.Builder()
+                .baseUrl(BaseUrl.BASE_UPLOAD_IMAGE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build()
+            return retrofit.create(UploadImageApiService::class.java)
         }
     }
 }
