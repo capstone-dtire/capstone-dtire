@@ -35,10 +35,11 @@ async function addDetectionHistory(req, res) {
 
     const condition_title = req.body.condition_title;
     const recommendation = req.body.recommendation;
+    const image_url = req.body.image_url;
 
     // check if condition_title or recommendation is null
     // reject if any of them is null
-    if (condition_title === null || recommendation === null || user_id === null) {
+    if (condition_title === null || recommendation === null || user_id === null || image_url === null) {
         res.json({
             status: 400,
             message: 'Invalid request'
@@ -47,7 +48,7 @@ async function addDetectionHistory(req, res) {
     }
 
     // insert into detection_history
-    await db.none('INSERT INTO public.detection_history(detection_id, user_id, condition_title, recommendation, date_of_check) VALUES($1, $2, $3, $4, $5)', [detection_id, user_id, condition_title, recommendation, timestamp])
+    await db.none('INSERT INTO public.detection_history(detection_id, user_id, condition_title, recommendation, date_of_check, image_url) VALUES($1, $2, $3, $4, $5, $6)', [detection_id, user_id, condition_title, recommendation, timestamp, image_url])
         .then(function () {
             res.status(201).json({
                 status: 201,

@@ -206,7 +206,8 @@ describe('POST /api/detection_history', () => {
             .send({
                 user_id: user_id,
                 condition_title: 'Fever',
-                recommendation: 'Take an aspirin'
+                recommendation: 'Take an aspirin',
+                image_url: 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png'
             })
             .end((err, res) => {
                 res.should.have.status(201);
