@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const db = require('../config/database');
 const { v4: uuidv4 } = require('uuid');
 
-function register(req, res) {
+async function register(req, res) {
 
     // Test if name, email, and password are not null
     if (!req.body.name || !req.body.email || !req.body.password) {
@@ -43,7 +43,7 @@ function register(req, res) {
     const user_id = uuidv4();
 
     // try to insert the user into the database
-    db.none('INSERT INTO public.user (user_id, email, password, name, address, phone) VALUES($1, $2, $3, $4, $5, $6)', [user_id, email, hashedPassword, name, null, null])
+    await db.none('INSERT INTO public.user (user_id, email, password, name, address, phone) VALUES($1, $2, $3, $4, $5, $6)', [user_id, email, hashedPassword, name, null, null])
         .then(function () {
             res.status(201).json({
                 status: 201,

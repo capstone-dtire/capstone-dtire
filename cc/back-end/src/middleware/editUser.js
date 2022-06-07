@@ -1,10 +1,10 @@
 const db = require('../config/database');
 
-function editUser(req, res) {
+async function editUser(req, res) {
     const user_id = req.params.user_id;
 
     // Check if the user_id is existent
-    db.any('SELECT * FROM public.user WHERE user_id = $1', [user_id])
+    await db.any('SELECT * FROM public.user WHERE user_id = $1', [user_id])
         .then(function (user) {
             if (user.length === 0) {
                 res.status(404).json({
@@ -39,7 +39,7 @@ function editUser(req, res) {
     }
 
     // query if name or email is null
-    db.one('SELECT name, email, address, phone FROM public.user WHERE user_id = $1', [user_id])
+    await db.one('SELECT name, email, address, phone FROM public.user WHERE user_id = $1', [user_id])
         .then(function (user) {
             if (name === null) {
                 name = user.name;

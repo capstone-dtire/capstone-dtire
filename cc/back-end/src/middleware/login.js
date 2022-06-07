@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const db = require('../config/database');
 
-function login(req, res) {
+async function login(req, res) {
 
     // Check if email is valid
     if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(req.body.email)) {
@@ -16,7 +16,7 @@ function login(req, res) {
     const password = req.body.password;
 
     // get the user from the database
-    db.one('SELECT * FROM public.user WHERE email = $1', [email])
+    await db.one('SELECT * FROM public.user WHERE email = $1', [email])
         .then(function (user) {
             // compare the password
             if (bcrypt.compareSync(password, user.password)) {

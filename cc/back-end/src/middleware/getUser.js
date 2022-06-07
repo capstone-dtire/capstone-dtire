@@ -1,9 +1,9 @@
 const db = require('../config/database');
 
-function getUser(req, res) {
+async function getUser(req, res) {
     const user_id = req.params.user_id;
 
-    db.any('SELECT * FROM public.user WHERE user_id = $1', [user_id])
+    await db.any('SELECT * FROM public.user WHERE user_id = $1', [user_id])
         .then(function (user) {
             // Check if the result is null
             if (user.length === 0) {

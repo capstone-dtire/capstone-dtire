@@ -1,11 +1,11 @@
 const db = require('../config/database');
 const { v4: uuidv4 } = require('uuid');
 
-function addDetectionHistory(req, res) {
+async function addDetectionHistory(req, res) {
     const user_id = req.body.user_id;
 
     // Check if the user_id is existent
-    db.any('SELECT * FROM public.user WHERE user_id = $1', [user_id])
+    await db.any('SELECT * FROM public.user WHERE user_id = $1', [user_id])
         .then(function (user) {
             if (user.length === 0) {
                 res.status(404).json({
@@ -47,7 +47,7 @@ function addDetectionHistory(req, res) {
     }
 
     // insert into detection_history
-    db.none('INSERT INTO public.detection_history(detection_id, user_id, condition_title, recommendation, date_of_check) VALUES($1, $2, $3, $4, $5)', [detection_id, user_id, condition_title, recommendation, timestamp])
+    await db.none('INSERT INTO public.detection_history(detection_id, user_id, condition_title, recommendation, date_of_check) VALUES($1, $2, $3, $4, $5)', [detection_id, user_id, condition_title, recommendation, timestamp])
         .then(function () {
             res.status(201).json({
                 status: 201,
