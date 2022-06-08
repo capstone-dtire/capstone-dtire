@@ -53,4 +53,12 @@
     <string name="confirm_your_password">Please confirm your password</string>
     <string name="password_not_match">Password didn\'t match</string>
     <string name="user_greeting">Hi, %s!</string>
+    <string name="no_connection">No Connection</string>
+    <string name="open">Open</string>
+    <string name="closed">Closed</string>
+    <string name="detail">Detail</string>
+    <string name="call">Call</string>
+    <string name="result_crack">Our system detects the test results from your tire image as a crack / leak, we recommend you to immediately repair your tire through the tire patch feature.</string>
+    <string name="result_ok">Our system detects the test result from your tire image as Ok and is still good.</string>
+    <string name="result">Result:</string>
 </resources>

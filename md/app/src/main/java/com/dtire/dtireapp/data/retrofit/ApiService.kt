@@ -1,10 +1,9 @@
 package com.dtire.dtireapp.data.retrofit
 
-import com.dtire.dtireapp.data.response.LoginResponse
-import com.dtire.dtireapp.data.response.RegisterResponse
-import com.dtire.dtireapp.data.response.UpdateUserResponse
-import com.dtire.dtireapp.data.response.UserResponse
+import com.dtire.dtireapp.data.response.*
+import okhttp3.MultipartBody
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
@@ -26,7 +25,7 @@ interface ApiService {
     @GET("user/{id}")
     fun getUser(
         @Path("id") id: String,
-    ) : Call<UserResponse>
+    ): Call<UserResponse>
 
     @FormUrlEncoded
     @PUT("user/{id}")
@@ -37,4 +36,24 @@ interface ApiService {
         @Field("address") address: String,
         @Field("phone") phone: String,
     ): Call<UpdateUserResponse>
+
+    @Multipart
+    @POST("upload-tire")
+    fun uploadPhoto(
+        @Part file: MultipartBody.Part
+    ): Call<UploadPhotoResponse>
+}
+
+interface MapsApiService {
+    @GET
+    suspend fun getNearbyPlaces(
+        @Url url: String
+    ): Response<MapsResponse>
+}
+
+interface UploadImageApiService {
+    @POST("pred")
+    fun uploadImageToCloudFunc(
+        @Query("url") url: String
+    ): Call<ImageResultResponse>
 }

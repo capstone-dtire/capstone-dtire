@@ -6,12 +6,20 @@ import android.content.pm.PackageManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.dtire.dtireapp.R
+import com.dtire.dtireapp.data.State
+import com.dtire.dtireapp.data.response.MapsResponse
+import com.dtire.dtireapp.data.response.ResultsItem
 import com.dtire.dtireapp.databinding.ActivityMapsBinding
+import com.dtire.dtireapp.utils.StateCallback
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -19,12 +27,22 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlin.collections.ArrayList
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
-
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, StateCallback<Any> {
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var googlePlaceList: ArrayList<ResultsItem>
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private val viewModel: MapsViewModel by viewModels()
+    private var lat: Double = 0.0
+    private var lng: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +54,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.mapBottomSheet)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        googlePlaceList = ArrayList()
+        getMyLastLocation()
+
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -47,31 +71,111 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.uiSettings.isCompassEnabled = true
         mMap.uiSettings.isMapToolbarEnabled = true
 
-        getMyLastLocation()
+        mMap.setOnMapClickListener {
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
     }
 
-    private val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            when {
-                permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> {
-                    getMyLastLocation()
-                }
-                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> {
-                    getMyLastLocation()
-                }
-                else -> {
-                    // No location access granted.
+    private fun getNearbyPlace() {
+        val prop = applicationContext.packageManager.getApplicationInfo(
+            applicationContext.packageName, PackageManager.GET_META_DATA
+        )
+        val bundle = Bundle(prop.metaData)
+        val api = bundle.getString("com.google.android.geo.API_KEY")
+
+        Log.d("TAG", "showStartMarker: $lat, $lng")
+        val url = ("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="
+                + lat + "," + lng + "&radius=1500" + "&type=" + "car_repair"
+                + "&key=" + api)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            viewModel.getNearbyPlace(url).collect {
+                when (it) {
+                    is State.Success -> it.data?.let { placeData -> onSuccess(placeData) }
+                    is State.Loading -> onLoading()
+                    is State.Error -> onFailed(it.message)
                 }
             }
         }
+    }
 
-    private fun checkPermission(permission: String): Boolean {
-        return ContextCompat.checkSelfPermission(
-            this,
-            permission
-        ) == PackageManager.PERMISSION_GRANTED
+    override fun onSuccess(data: Any) {
+        val googleResponseModel: MapsResponse = data as MapsResponse
+        if (googleResponseModel.results != null && googleResponseModel.results.isNotEmpty()) {
+            googlePlaceList.clear()
+            mMap.clear()
+            for (i in googleResponseModel.results.indices) {
+                googleResponseModel.results[i]?.let {
+                    googlePlaceList.add(it)
+                    addMarker(it, i)
+                }
+            }
+        }
+    }
+
+    override fun onLoading() {
+
+    }
+
+    override fun onFailed(message: String?) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun addMarker(locationData: ResultsItem, position: Int) {
+        val markerOptions = MarkerOptions()
+            .position(
+                LatLng(
+                    locationData.geometry?.location?.lat!!,
+                    locationData.geometry.location.lng!!
+                )
+            )
+            .title(locationData.name)
+
+        mMap.addMarker(markerOptions)?.tag = position
+        val prop = applicationContext.packageManager.getApplicationInfo(
+            applicationContext.packageName, PackageManager.GET_META_DATA
+        )
+        val bundle = Bundle(prop.metaData)
+        val api = bundle.getString("com.google.android.geo.API_KEY")
+        mMap.setOnMarkerClickListener { p0 ->
+            val result = googlePlaceList[p0.tag as Int]
+            binding.tvRepairShopName.text = result.name.toString()
+
+            if (result.photos != null) {
+                val photoUrl =
+                    "https://maps.googleapis.com/maps/api/place/photo?photoreference=${result.photos[0]?.photoReference}&sensor=false&maxheight=500&maxwidth=500&key=${api}"
+                Glide.with(applicationContext)
+                    .load(photoUrl)
+                    .into(binding.ivRepairShop)
+            } else {
+                binding.ivRepairShop.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        this@MapsActivity,
+                        R.drawable.ic_baseline_image_not_supported_24
+                    )
+                )
+            }
+
+            if (result.openingHours != null) {
+                if (result.openingHours.openNow == true) {
+                    binding.tvRepairShopStatus.apply {
+                        text = context.getString(R.string.open)
+                        setTextColor(resources.getColor(R.color.primary_green))
+                    }
+                } else {
+                    binding.tvRepairShopStatus.apply {
+                        text = context.getString(R.string.closed)
+                        setTextColor(resources.getColor(R.color.red))
+                    }
+                }
+            }
+
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED)
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            true
+        }
+
     }
 
     @SuppressLint("MissingPermission")
@@ -81,6 +185,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         ){
             fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
                 if (location != null) {
+                    lat = location.latitude
+                    lng = location.longitude
+                    getNearbyPlace()
                     showStartMarker(location)
                 } else {
                     Toast.makeText(
@@ -104,6 +211,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun showStartMarker(location: Location) {
         val startLocation = LatLng(location.latitude, location.longitude)
 
+
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -116,5 +224,30 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         mMap.isMyLocationEnabled = true
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(startLocation, 16f))
+    }
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+
+            when {
+                permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false -> {
+                    getMyLastLocation()
+                }
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false -> {
+                    getMyLastLocation()
+                }
+                else -> {
+                    // No location access granted.
+                }
+            }
+        }
+
+    private fun checkPermission(permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
     }
 }

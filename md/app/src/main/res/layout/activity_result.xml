@@ -32,15 +32,33 @@
                 android:id="@+id/iv_result_picture"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_marginHorizontal="16dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/person1"
                 android:transitionName="detail_image"
                 app:layout_constraintDimensionRatio="1:1"
-                android:layout_marginHorizontal="16dp"
-                android:src="@drawable/person1"
-                app:shapeAppearanceOverlay="@style/roundedImageView"
-                android:scaleType="centerCrop"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@style/roundedImageView" />
+
+            <TextView
+                android:id="@+id/tv_result_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@+id/iv_result_picture"
+                app:layout_constraintTop_toBottomOf="@+id/iv_result_picture" />
+
+            <TextView
+                android:id="@+id/tv_result_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_text"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@+id/tv_result_title"
+                app:layout_constraintTop_toBottomOf="@+id/tv_result_title" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 

@@ -43,7 +43,7 @@ class HistoryActivity : AppCompatActivity() {
         historyAdapter.setAllData(dummyData)
 
         binding.rvHistory.apply {
-            setHasFixedSize(true)
+//            setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@HistoryActivity)
             adapter = historyAdapter
         }

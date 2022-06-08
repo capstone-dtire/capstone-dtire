@@ -6,12 +6,19 @@ import androidx.lifecycle.MutableLiveData
 import com.dtire.dtireapp.data.response.*
 import com.dtire.dtireapp.data.retrofit.ApiConfig
 import com.dtire.dtireapp.data.retrofit.ApiService
+import com.dtire.dtireapp.data.retrofit.MapsApiService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class Repository {
     private val retrofit: ApiService = ApiConfig.getApiService()
+    private val mapsRetrofit: MapsApiService = ApiConfig.getMapsApiService()
 
     fun loginUser(email: String, password: String): LiveData<State<LoginResponse>> {
         val loginUser = MutableLiveData<State<LoginResponse>>()
@@ -113,4 +120,20 @@ class Repository {
             })
         return updateStatus
     }
+
+    fun getNearbyPlaces(url: String): Flow<State<Any>> = flow<State<Any>> {
+        emit(State.Loading())
+
+        val response = mapsRetrofit.getNearbyPlaces(url)
+        if (response.body()?.results?.size!! > 0) {
+            emit(State.Success(response.body()!!))
+            Log.d("TAG", "getNearbyPlaces: berhasil: ${response.body()}")
+        } else {
+            emit(State.Error(response.message()))
+            Log.d("TAG", "getNearbyPlaces: gagal1: ${response.body()}")
+        }
+    }.catch {
+        emit(State.Error(it.message))
+        Log.d("TAG", "getNearbyPlaces: gagal2 : ${it.message}")
+    }.flowOn(Dispatchers.IO)
 }
