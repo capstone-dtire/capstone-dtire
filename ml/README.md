@@ -14,3 +14,7 @@ dataset link = https://www.kaggle.com/datasets/jehanbhathena/tire-texture-image-
 ## Prediction
 According to this https://github.com/keras-team/keras/blob/master/keras/applications/imagenet_utils.py#L72  
 Restnet use 'caffe' style / zero-centering on preprocessing the input data, so when you want to predict using the model, make sure to zero centering the image data so the model wont misclasify the result.
+
+
+## Preprocess Function
+This used by CC for preprocess the image data before fed it to the model.
