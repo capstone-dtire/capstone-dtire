@@ -62,7 +62,7 @@ class ProfileEditActivity : AppCompatActivity(), StateCallback<String>{
         preference = UserPreference(this)
         val userId = preference.getUserId()
         val localUserData = preference.getUserData()
-
+        photoUrl = localUserData.urlPicture
         binding.apply {
             Glide.with(applicationContext)
                 .load(localUserData.urlPicture)

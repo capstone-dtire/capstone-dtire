@@ -64,4 +64,5 @@
     <string name="ok">Normal</string>
     <string name="back">Back</string>
     <string name="map_distance">%s km</string>
+    <string name="open_maps">Open Maps</string>
 </resources>

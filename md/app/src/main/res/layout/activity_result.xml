@@ -68,6 +68,20 @@
                 app:layout_constraintEnd_toEndOf="@+id/iv_result_picture"
                 app:layout_constraintStart_toStartOf="@+id/iv_result_picture"
                 app:layout_constraintTop_toBottomOf="@+id/tv_result_title" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_to_maps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_corner"
+                android:backgroundTint="@color/primary_green"
+                android:text="@string/open_maps"
+                android:textColor="@color/white"
+                android:paddingHorizontal="16dp"
+                app:layout_constraintStart_toStartOf="@+id/tv_result_detail"
+                app:layout_constraintTop_toBottomOf="@+id/tv_result_detail" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 

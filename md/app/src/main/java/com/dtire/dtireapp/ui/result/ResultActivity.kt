@@ -14,7 +14,7 @@ import com.dtire.dtireapp.data.State
 import com.dtire.dtireapp.data.preferences.UserPreference
 import com.dtire.dtireapp.data.response.HistorySuccessResponse
 import com.dtire.dtireapp.databinding.ActivityResultBinding
-import com.dtire.dtireapp.ui.home.HomeActivity
+import com.dtire.dtireapp.ui.map.MapsActivity
 import com.dtire.dtireapp.utils.StateCallback
 
 class ResultActivity : AppCompatActivity(), StateCallback<HistorySuccessResponse> {
@@ -49,6 +49,11 @@ class ResultActivity : AppCompatActivity(), StateCallback<HistorySuccessResponse
                     recommendation = getString(R.string.result_crack)
                     tvResultTitle.text = getString(R.string.crack)
                     tvResultDetail.text = getString(R.string.result_crack)
+                    btnToMaps.visibility = visible
+                    btnToMaps.setOnClickListener {
+                        val intent = Intent(this@ResultActivity, MapsActivity::class.java)
+                        startActivity(intent)
+                    }
                 }
             } else {
                 binding.apply {
@@ -56,6 +61,7 @@ class ResultActivity : AppCompatActivity(), StateCallback<HistorySuccessResponse
                     recommendation = getString(R.string.result_ok)
                     tvResultTitle.text = getString(R.string.ok)
                     tvResultDetail.text = getString(R.string.result_ok)
+                    btnToMaps.visibility = invisible
                 }
             }
             addToHistory(imageUrl)
