@@ -13,4 +13,4 @@ dataset link = https://www.kaggle.com/datasets/jehanbhathena/tire-texture-image-
 
 ## Prediction
 According to this https://github.com/keras-team/keras/blob/master/keras/applications/imagenet_utils.py#L72  
-Restnet use 'caffe' style / zero-centering on preprocessing the input data, so make sure to zero centering the image data so the model wont misclasify the result.
+Restnet use 'caffe' style / zero-centering on preprocessing the input data, so when you want to predict using this model make sure to zero centering the image data so the model wont misclasify the result.
