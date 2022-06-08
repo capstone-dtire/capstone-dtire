@@ -41,9 +41,10 @@ async function register(req, res) {
 
     // generate random id with uuid
     const user_id = uuidv4();
+    const url_picture = "https://storage.googleapis.com/dtire-images/1654676755925-default-profile-photo.jpg"
 
     // try to insert the user into the database
-    await db.none('INSERT INTO public.user (user_id, email, password, name, address, phone) VALUES($1, $2, $3, $4, $5, $6)', [user_id, email, hashedPassword, name, null, null])
+    await db.none('INSERT INTO public.user (user_id, email, password, name, address, phone, url_picture) VALUES($1, $2, $3, $4, $5, $6, $7)', [user_id, email, hashedPassword, name, null, null, url_picture])
         .then(function () {
             res.status(201).json({
                 status: 201,
