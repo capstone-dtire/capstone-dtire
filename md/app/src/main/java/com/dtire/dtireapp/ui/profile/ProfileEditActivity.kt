@@ -4,6 +4,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.app.Dialog
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -11,6 +12,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -19,20 +21,32 @@ import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.bumptech.glide.Glide
 import com.dtire.dtireapp.R
 import com.dtire.dtireapp.data.State
 import com.dtire.dtireapp.data.preferences.UserPreference
+import com.dtire.dtireapp.data.response.UploadPhotoResponse
 import com.dtire.dtireapp.data.response.UserItem
+import com.dtire.dtireapp.data.retrofit.ApiConfig
 import com.dtire.dtireapp.databinding.ActivityProfileEditBinding
 import com.dtire.dtireapp.utils.StateCallback
 import com.dtire.dtireapp.utils.uriToFile
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 
 class ProfileEditActivity : AppCompatActivity(), StateCallback<String>{
     private lateinit var binding: ActivityProfileEditBinding
     private lateinit var currentPhotoPath: String
     private lateinit var preference: UserPreference
     private var getFile: File? = null
+    private var photoUrl: String? = null
     private val viewModel: ProfileEditViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +64,9 @@ class ProfileEditActivity : AppCompatActivity(), StateCallback<String>{
         val localUserData = preference.getUserData()
 
         binding.apply {
+            Glide.with(applicationContext)
+                .load(localUserData.urlPicture)
+                .into(ivEditPhoto)
             etEditEmail.setText(localUserData.email)
             etEditName.setText(localUserData.name)
             etEditAddress.setText(localUserData.address)
@@ -97,7 +114,7 @@ class ProfileEditActivity : AppCompatActivity(), StateCallback<String>{
                     address,
                     userId,
                     phone,
-                    "",
+                    photoUrl,
                     name,
                     email,
                 )
@@ -203,6 +220,38 @@ class ProfileEditActivity : AppCompatActivity(), StateCallback<String>{
         launcherIntentGallery.launch(chooser)
     }
 
+    private fun uploadPhoto() {
+        val file = reduceFileImage(getFile as File)
+        val requestImageFile = file.asRequestBody("image/jpeg".toMediaType())
+        val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData(
+            "file",
+            file.name,
+            requestImageFile
+        )
+        ApiConfig.getApiService().uploadPhoto(imageMultipart)
+            .enqueue(object : Callback<UploadPhotoResponse> {
+                override fun onResponse(
+                    call: Call<UploadPhotoResponse>,
+                    response: Response<UploadPhotoResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        photoUrl = response.body()?.url
+                        Glide.with(applicationContext)
+                            .load(response.body()?.url)
+                            .into(binding.ivEditPhoto)
+                        Log.d("TAGG", "uploadPhotoSuccess")
+                    } else {
+                        Log.d("TAGG", "uploadPhotoFailed1: ${response.message()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<UploadPhotoResponse>, t: Throwable) {
+                    Log.d("TAGG", "uploadPhotoFailed2: ${t.message}")
+                }
+
+            })
+    }
+
     private val launcherIntentCamera = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
@@ -210,6 +259,7 @@ class ProfileEditActivity : AppCompatActivity(), StateCallback<String>{
             val myFile = File(currentPhotoPath)
             val result = BitmapFactory.decodeFile(myFile.path)
             getFile = myFile
+            uploadPhoto()
             binding.ivEditPhoto.setImageBitmap(result)
         }
     }
@@ -221,7 +271,8 @@ class ProfileEditActivity : AppCompatActivity(), StateCallback<String>{
             val selectedImg: Uri = result.data?.data as Uri
             val myFile = uriToFile(selectedImg, this@ProfileEditActivity)
             getFile = myFile
-            binding.ivEditPhoto.setImageURI(selectedImg)
+            uploadPhoto()
+//            binding.ivEditPhoto.setImageURI(selectedImg)
         }
     }
 
@@ -232,6 +283,21 @@ class ProfileEditActivity : AppCompatActivity(), StateCallback<String>{
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun reduceFileImage(file: File): File {
+        val bitmap = BitmapFactory.decodeFile(file.path)
+        var compressQuality = 100
+        var streamLength: Int
+        do {
+            val bmpStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, compressQuality, bmpStream)
+            val bmpPicByteArray = bmpStream.toByteArray()
+            streamLength = bmpPicByteArray.size
+            compressQuality -= 5
+        } while (streamLength > 1000000)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, compressQuality, FileOutputStream(file))
+        return file
     }
 
 }

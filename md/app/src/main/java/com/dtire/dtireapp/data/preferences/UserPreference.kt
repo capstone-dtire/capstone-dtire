@@ -25,6 +25,7 @@ class UserPreference(context: Context) {
             putString(USER_EMAIL, user.email)
             putString(USER_ADDRESS, user.address)
             putString(USER_PHONE, user.phone)
+            putString(USER_IMAGE_URL, user.urlPicture)
             .apply()
         }
     }
@@ -39,7 +40,7 @@ class UserPreference(context: Context) {
             preferences.getString(USER_ADDRESS, "") ?: "",
             preferences.getString(USER_ID, "") ?: "",
             preferences.getString(USER_PHONE, "") ?: "",
-            "",
+            preferences.getString(USER_IMAGE_URL, "") ?: "",
             preferences.getString(USER_NAME, "") ?: "",
             preferences.getString(USER_EMAIL, "") ?: "",
         )
@@ -58,6 +59,7 @@ class UserPreference(context: Context) {
         private const val USER_EMAIL = "user_email"
         private const val USER_ADDRESS = "user_address"
         private const val USER_PHONE = "user_phone"
+        private const val USER_IMAGE_URL = "user_image_url"
         private const val STATUS = "status"
     }
 

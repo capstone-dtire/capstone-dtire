@@ -30,6 +30,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.bumptech.glide.Glide
 import com.dtire.dtireapp.R
 import com.dtire.dtireapp.data.State
 import com.dtire.dtireapp.data.preferences.UserPreference
@@ -136,6 +137,9 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
     override fun onSuccess(data: UserItem) {
         preferences.saveUserData(data)
         binding.tvHomeGreeting.text = getString(R.string.user_greeting, data.name)
+        Glide.with(applicationContext)
+            .load(data.urlPicture ?: "https://static.wikia.nocookie.net/far-verona/images/9/99/Placeholder-avatar.png/revision/latest?cb=20180510034255")
+            .into(binding.ivHomeProfilePhoto)
     }
 
     override fun onLoading() {
@@ -153,6 +157,14 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
             isUploadLoading(true)
         } else {
             isUploadLoading(false)
+        }
+        val userId = preferences.getUserId()
+        viewModel.getUser(userId).observe(this) {
+            when(it) {
+                is State.Success -> it.data?.let { data -> onSuccess(data) }
+                is State.Error -> onFailed(it.message)
+                is State.Loading -> onLoading()
+            }
         }
         binding.tvHomeGreeting.text = getString(R.string.user_greeting, preferences.getUserData().name)
     }

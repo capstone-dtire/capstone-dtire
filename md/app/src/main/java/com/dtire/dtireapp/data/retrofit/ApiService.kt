@@ -35,6 +35,7 @@ interface ApiService {
         @Field("email") email: String,
         @Field("address") address: String,
         @Field("phone") phone: String,
+        @Field("url_picture") urlPicture: String,
     ): Call<UpdateUserResponse>
 
     @Multipart

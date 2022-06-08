@@ -94,7 +94,7 @@ class Repository {
         val updateStatus = MutableLiveData<State<String>>()
 
         updateStatus.postValue(State.Loading())
-        retrofit.updateUser(id, userData.name, userData.email, userData.address ?: "", userData.phone ?: "")
+        retrofit.updateUser(id, userData.name, userData.email, userData.address ?: "", userData.phone ?: "", userData.urlPicture ?: "")
             .enqueue(object : Callback<UpdateUserResponse> {
                 override fun onResponse(
                     call: Call<UpdateUserResponse>,
