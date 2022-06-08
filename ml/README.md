@@ -16,5 +16,5 @@ According to this https://github.com/keras-team/keras/blob/master/keras/applicat
 Restnet use 'caffe' style / zero-centering on preprocessing the input data, so when you want to predict using the model, make sure to zero centering the image data so the model wont misclasify the result.
 
 
-## Preprocess Function
-This used by CC for preprocess the image data before fed it to the model.
+## preprocess_function.ipynb
+This used on Cloud Function for preprocess the image data before fed it to the model.
