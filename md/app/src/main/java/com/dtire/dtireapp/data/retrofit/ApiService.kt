@@ -35,6 +35,7 @@ interface ApiService {
         @Field("email") email: String,
         @Field("address") address: String,
         @Field("phone") phone: String,
+        @Field("url_picture") urlPicture: String,
     ): Call<UpdateUserResponse>
 
     @Multipart
@@ -42,6 +43,20 @@ interface ApiService {
     fun uploadPhoto(
         @Part file: MultipartBody.Part
     ): Call<UploadPhotoResponse>
+
+    @FormUrlEncoded
+    @POST("detection_history")
+    fun addToHistory(
+        @Field("user_id") id: String,
+        @Field("condition_title") conditionTitle: String,
+        @Field("recommendation") recommendation: String,
+        @Field("image_url") imageUrl: String,
+    ): Call<HistorySuccessResponse>
+
+    @GET("detection_history/{id}")
+    fun getHistory(
+        @Path("id") id: String
+    ): Call<HistoryResponse>
 }
 
 interface MapsApiService {
@@ -49,6 +64,13 @@ interface MapsApiService {
     suspend fun getNearbyPlaces(
         @Url url: String
     ): Response<MapsResponse>
+
+    @GET
+    suspend fun getPlaceDetail(
+        @Url url: String
+    ): Response<PlaceDetailResponse>
+
+
 }
 
 interface UploadImageApiService {

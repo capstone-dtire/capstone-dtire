@@ -3,6 +3,7 @@ package com.dtire.dtireapp.ui.map
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -17,6 +18,7 @@ import com.bumptech.glide.Glide
 import com.dtire.dtireapp.R
 import com.dtire.dtireapp.data.State
 import com.dtire.dtireapp.data.response.MapsResponse
+import com.dtire.dtireapp.data.response.PlaceDetailResponse
 import com.dtire.dtireapp.data.response.ResultsItem
 import com.dtire.dtireapp.databinding.ActivityMapsBinding
 import com.dtire.dtireapp.utils.StateCallback
@@ -29,6 +31,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.maps.android.SphericalUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -122,6 +125,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, StateCallback<Any>
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
+    @SuppressLint("PotentialBehaviorOverride")
     private fun addMarker(locationData: ResultsItem, position: Int) {
         val markerOptions = MarkerOptions()
             .position(
@@ -140,6 +144,47 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, StateCallback<Any>
         val api = bundle.getString("com.google.android.geo.API_KEY")
         mMap.setOnMarkerClickListener { p0 ->
             val result = googlePlaceList[p0.tag as Int]
+            val currentLocation = LatLng(lat, lng)
+            val placeLocation = LatLng(result.geometry?.location?.lat!!, result.geometry.location.lng!!)
+            val distance = (SphericalUtil.computeDistanceBetween(currentLocation, placeLocation) / 1000)
+            val formattedDistance = String.format("%.2f", distance)
+            val placeDetail = "https://maps.googleapis.com/maps/api/place/details/json?placeid=${result.placeId}&key=${api}"
+
+            CoroutineScope(Dispatchers.Main).launch {
+                viewModel.getPlaceDetail(placeDetail).collect {
+                    when (it) {
+                        is State.Success -> it.data?.let { response ->
+                            val data = response as PlaceDetailResponse
+                            if (data.result?.formattedPhoneNumber != null) {
+                                binding.apply {
+                                    tvRepairShopPhone.visibility = visible
+                                    tvRepairShopPhone.text = data.result.formattedPhoneNumber
+                                    btnMarkerCall.apply {
+                                        isEnabled = true
+                                        backgroundTintList = ColorStateList.valueOf(resources.getColor(R.color.primary_green))
+                                        setOnClickListener {
+                                            Log.d("TAG", "callClick: Halo")
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                binding.apply {
+                                    binding.tvRepairShopPhone.visibility = gone
+                                    btnMarkerCall.apply {
+                                        isEnabled = false
+                                        backgroundTintList = ColorStateList.valueOf(resources.getColor(R.color.secondary_green))
+                                    }
+
+                                }
+                            }
+                        }
+                        is State.Loading -> {}
+                        is State.Error -> {}
+                    }
+                }
+            }
+            binding.tvRepairShopDistance.text = getString(R.string.map_distance, formattedDistance)
             binding.tvRepairShopName.text = result.name.toString()
 
             if (result.photos != null) {
@@ -158,16 +203,32 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, StateCallback<Any>
             }
 
             if (result.openingHours != null) {
-                if (result.openingHours.openNow == true) {
-                    binding.tvRepairShopStatus.apply {
-                        text = context.getString(R.string.open)
-                        setTextColor(resources.getColor(R.color.primary_green))
+                when (result.openingHours.openNow) {
+                    true -> {
+                        binding.tvRepairShopStatus.apply {
+                            visibility = visible
+                            text = context.getString(R.string.open)
+                            setTextColor(resources.getColor(R.color.primary_green))
+                        }
                     }
-                } else {
-                    binding.tvRepairShopStatus.apply {
-                        text = context.getString(R.string.closed)
-                        setTextColor(resources.getColor(R.color.red))
+                    false -> {
+                        binding.tvRepairShopStatus.apply {
+                            visibility = visible
+                            text = context.getString(R.string.closed)
+                            setTextColor(resources.getColor(R.color.red))
+                        }
                     }
+                    else -> {
+                        binding.tvRepairShopStatus.apply {
+                            visibility = gone
+                            text = ""
+                        }
+                    }
+                }
+            } else {
+                binding.tvRepairShopStatus.apply {
+                    visibility = gone
+                    text = ""
                 }
             }
 

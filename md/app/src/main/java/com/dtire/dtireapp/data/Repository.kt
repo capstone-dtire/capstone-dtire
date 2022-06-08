@@ -94,7 +94,7 @@ class Repository {
         val updateStatus = MutableLiveData<State<String>>()
 
         updateStatus.postValue(State.Loading())
-        retrofit.updateUser(id, userData.name, userData.email, userData.address ?: "", userData.phone ?: "")
+        retrofit.updateUser(id, userData.name, userData.email, userData.address ?: "", userData.phone ?: "", userData.urlPicture ?: "")
             .enqueue(object : Callback<UpdateUserResponse> {
                 override fun onResponse(
                     call: Call<UpdateUserResponse>,
@@ -127,13 +127,82 @@ class Repository {
         val response = mapsRetrofit.getNearbyPlaces(url)
         if (response.body()?.results?.size!! > 0) {
             emit(State.Success(response.body()!!))
-            Log.d("TAG", "getNearbyPlaces: berhasil: ${response.body()}")
         } else {
             emit(State.Error(response.message()))
-            Log.d("TAG", "getNearbyPlaces: gagal1: ${response.body()}")
         }
     }.catch {
         emit(State.Error(it.message))
-        Log.d("TAG", "getNearbyPlaces: gagal2 : ${it.message}")
     }.flowOn(Dispatchers.IO)
+
+    fun getPlaceDetail(url: String): Flow<State<Any>> = flow<State<Any>> {
+        emit(State.Loading())
+
+        val response = mapsRetrofit.getPlaceDetail(url)
+        if (response.isSuccessful) {
+            response.body()?.let { emit(State.Success(it)) }
+            Log.d("TAG", "getPlaceDetail: berhasil: ${response.body()}")
+        } else {
+            emit(State.Error(response.message()))
+            Log.d("TAG", "getPlaceDetail: gagal1: ${response.message()}")
+        }
+    }.catch {
+        emit(State.Error(it.message))
+        Log.d("TAG", "getPlaceDetail: gagal2: ${it.message!!}")
+    }.flowOn(Dispatchers.IO)
+
+
+
+    fun addToHistory(id: String,
+                     condition: String,
+                     recommendation: String,
+                     imageUrl: String): LiveData<State<HistorySuccessResponse>> {
+        val history = MutableLiveData<State<HistorySuccessResponse>>()
+
+        retrofit.addToHistory(id, condition, recommendation, imageUrl)
+            .enqueue(object : Callback<HistorySuccessResponse> {
+                override fun onResponse(
+                    call: Call<HistorySuccessResponse>,
+                    response: Response<HistorySuccessResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        history.postValue(State.Success(response.body()))
+                        Log.d("TAG", "onResponse: ${response.body()}")
+                    } else {
+                        history.postValue(State.Error(response.message()))
+                        Log.d("TAG", "onResponseFailed1: ${response.body()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<HistorySuccessResponse>, t: Throwable) {
+                    history.postValue(State.Error(t.message))
+                    Log.d("TAG", "onFailed1: ${t.message}")
+                }
+
+            })
+        return history
+    }
+
+    fun getHistory(id: String): LiveData<State<HistoryResponse>> {
+        val history = MutableLiveData<State<HistoryResponse>>()
+
+        history.postValue(State.Loading())
+        retrofit.getHistory(id).enqueue(object : Callback<HistoryResponse> {
+            override fun onResponse(
+                call: Call<HistoryResponse>,
+                response: Response<HistoryResponse>
+            ) {
+                if (response.isSuccessful) {
+                    history.postValue(State.Success(response.body()))
+                } else {
+                    history.postValue(State.Error(response.body()?.message))
+                }
+            }
+
+            override fun onFailure(call: Call<HistoryResponse>, t: Throwable) {
+                history.postValue(State.Error(t.message))
+            }
+
+        })
+        return history
+    }
 }

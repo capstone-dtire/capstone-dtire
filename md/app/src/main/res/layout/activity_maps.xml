@@ -30,7 +30,6 @@
             android:id="@+id/tv_repair_shop_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Repair Shop's Name"
             android:textColor="@color/primary_text"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -41,7 +40,6 @@
             android:id="@+id/tv_repair_shop_distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0km"
             app:layout_constraintStart_toStartOf="@+id/tv_repair_shop_name"
             app:layout_constraintTop_toBottomOf="@+id/tv_repair_shop_name" />
 
@@ -57,7 +55,7 @@
             android:id="@+id/tv_repair_shop_phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Phone number"
+            android:textColor="@color/primary_text"
             app:layout_constraintStart_toStartOf="@+id/tv_repair_shop_status"
             app:layout_constraintTop_toBottomOf="@+id/tv_repair_shop_status" />
 
@@ -70,30 +68,13 @@
             app:layout_constraintStart_toStartOf="@+id/tv_repair_shop_phone"
             app:layout_constraintTop_toBottomOf="@+id/tv_repair_shop_phone">
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_marker_detail"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/rounded_corner_with_stroke"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:paddingVertical="5dp"
-                android:stateListAnimator="@null"
-                android:text="@string/detail"
-                android:textAllCaps="false"
-                android:textColor="@color/primary_green"
-                android:textSize="14sp"
-                android:textStyle="bold" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_marker_call"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginEnd="8dp"
-                android:layout_weight="1"
                 android:background="@drawable/rounded_corner"
                 android:backgroundTint="@color/primary_green"
                 android:drawableStart="@drawable/ic_baseline_call_24"

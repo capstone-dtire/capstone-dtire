@@ -59,6 +59,10 @@
     <string name="detail">Detail</string>
     <string name="call">Call</string>
     <string name="result_crack">Our system detects the test results from your tire image as a crack / leak, we recommend you to immediately repair your tire through the tire patch feature.</string>
-    <string name="result_ok">Our system detects the test result from your tire image as Ok and is still good.</string>
-    <string name="result">Result:</string>
+    <string name="result_ok">Our system detects the test result from your tire image as OK and is still good.</string>
+    <string name="crack">Cracked</string>
+    <string name="ok">Normal</string>
+    <string name="back">Back</string>
+    <string name="map_distance">%s km</string>
+    <string name="open_maps">Open Maps</string>
 </resources>

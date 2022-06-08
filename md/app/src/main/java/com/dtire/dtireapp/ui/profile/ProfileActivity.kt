@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.dtire.dtireapp.R
 import com.dtire.dtireapp.data.State
 import com.dtire.dtireapp.data.preferences.UserPreference
@@ -51,19 +52,20 @@ class ProfileActivity : AppCompatActivity(), StateCallback<UserItem> {
     override fun onResume() {
         super.onResume()
         val userId = preference.getUserId()
-        if (userId != null) {
-            viewModel.getData(userId).observe(this) {
-                when (it) {
-                    is State.Success -> it.data?.let { data -> onSuccess(data) }
-                    is State.Loading -> onLoading()
-                    is State.Error -> onFailed(it.message)
-                }
+        viewModel.getData(userId).observe(this) {
+            when (it) {
+                is State.Success -> it.data?.let { data -> onSuccess(data) }
+                is State.Loading -> onLoading()
+                is State.Error -> onFailed(it.message)
             }
         }
     }
 
     override fun onSuccess(data: UserItem) {
         binding.apply {
+            Glide.with(applicationContext)
+                .load(data.urlPicture)
+                .into(ivProfilePicture)
             tvUserName.text = data.name
             tvProfileEmail.text = data.email
             tvProfileAddress.text = data.address ?: "-"

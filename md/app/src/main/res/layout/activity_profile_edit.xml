@@ -28,7 +28,6 @@
             android:id="@+id/iv_edit_photo"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:src="@drawable/person1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tb_profile_edit" />
