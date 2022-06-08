@@ -67,6 +67,8 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
     private var getFile: File? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val viewModel: HomeViewModel by viewModels()
+    private var uploadingStatus: Boolean = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -147,6 +149,11 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
 
     override fun onResume() {
         super.onResume()
+        if (uploadingStatus) {
+            isUploadLoading(true)
+        } else {
+            isUploadLoading(false)
+        }
         binding.tvHomeGreeting.text = getString(R.string.user_greeting, preferences.getUserData().name)
     }
 
@@ -163,14 +170,14 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
 
     private fun isUploadLoading(status: Boolean) {
         if (status) {
-            val progressBar = ObjectAnimator.ofFloat(binding.homeLoading, View.ALPHA, 1f).setDuration(300)
+            val progressBar = ObjectAnimator.ofFloat(binding.homeLoading, View.ALPHA, 1f).setDuration(500)
             AnimatorSet().apply {
                 play(progressBar)
                 start()
             }
             binding.layoutHome.visibility = invisible
         } else {
-            val progressBar = ObjectAnimator.ofFloat(binding.homeLoading, View.ALPHA, 0f).setDuration(300)
+            val progressBar = ObjectAnimator.ofFloat(binding.homeLoading, View.ALPHA, 0f).setDuration(200)
             AnimatorSet().apply {
                 play(progressBar)
                 start()
@@ -332,7 +339,7 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
                 file.name,
                 requestImageFile
             )
-//            imageToCloudFunc("https://images.simpletire.com/image/upload/v1600461522/learn-blog/Cracked_and_Dangerous_Tires.jpg")
+            uploadingStatus = true
             isUploadLoading(true)
             ApiConfig.getApiService().uploadPhoto(imageMultipart)
                 .enqueue(object : Callback<UploadPhotoResponse> {
@@ -371,7 +378,7 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
                         )
                         intent.putExtra(ResultActivity.EXTRA_ORIGIN, "home")
                         intent.putExtra(ResultActivity.EXTRA_IMAGE_URL, url)
-                        finish()
+                        uploadingStatus = false
                         startActivity(intent)
                     } else {
                         Log.d("TAGG", "onResponseFailed3: ${response.message()}")
@@ -406,10 +413,7 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
         if (it.resultCode == RESULT_OK) {
             val myFile = File(currentPhotoPath)
             getFile = myFile
-//            val intent = Intent(this@HomeActivity, ResultActivity::class.java)
-//            intent.putExtra(ResultActivity.EXTRA_IMAGE, myFile.path)
             uploadPhoto()
-//            startActivity(intent)
         }
     }
 
@@ -420,9 +424,6 @@ class HomeActivity : AppCompatActivity(), StateCallback<UserItem> {
             val selectedImg: Uri = result.data?.data as Uri
             val myFile = uriToFile(selectedImg, this@HomeActivity)
             getFile = myFile
-//            val intent = Intent(this@HomeActivity, ResultActivity::class.java)
-//            intent.putExtra(ResultActivity.EXTRA_IMAGE, myFile.path)
-//            startActivity(intent)
             uploadPhoto()
         }
     }

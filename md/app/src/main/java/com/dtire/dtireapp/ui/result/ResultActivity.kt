@@ -77,6 +77,16 @@ class ResultActivity : AppCompatActivity(), StateCallback<HistorySuccessResponse
         }
     }
 
+//    override fun onBackPressed() {
+//        val origin = intent.getStringExtra(EXTRA_ORIGIN)
+//        if (origin == "home") {
+//            val intent = Intent(this@ResultActivity, HomeActivity::class.java)
+//            finish()
+//            startActivity(intent)
+//        }
+//        super.onBackPressed()
+//    }
+
     private fun addToHistory(imageUrl: String?) {
         preferences = UserPreference(this)
         val id = preferences.getUserId()
@@ -93,14 +103,15 @@ class ResultActivity : AppCompatActivity(), StateCallback<HistorySuccessResponse
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                val origin = intent.getStringExtra(EXTRA_ORIGIN)
-                if (origin == "home" ) {
-                    val intent = Intent(this@ResultActivity, HomeActivity::class.java)
-                    finish()
-                    startActivity(intent)
-                } else {
-                    finish()
-                }
+//                val origin = intent.getStringExtra(EXTRA_ORIGIN)
+//                if (origin == "home" ) {
+//                    val intent = Intent(this@ResultActivity, HomeActivity::class.java)
+//                    finish()
+//                    startActivity(intent)
+//                } else {
+//                    finish()
+//                }
+                finish()
             }
             else -> finish()
         }

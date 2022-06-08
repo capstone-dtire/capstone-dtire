@@ -1,9 +1,12 @@
 package com.dtire.dtireapp.ui.history
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -55,6 +58,13 @@ class HistoryActivity : AppCompatActivity(), StateCallback<HistoryResponse> {
     }
 
     override fun onSuccess(data: HistoryResponse) {
+        val historyToolbar = ObjectAnimator.ofFloat(binding.tbHistory, View.ALPHA, 1f).setDuration(500)
+        val historyRV = ObjectAnimator.ofFloat(binding.rvHistory, View.ALPHA, 1f).setDuration(500)
+        val progressBar = ObjectAnimator.ofFloat(binding.historyLoading, View.ALPHA, 0f).setDuration(500)
+        AnimatorSet().apply {
+            playTogether(progressBar, historyToolbar, historyRV)
+            start()
+        }
         historyAdapter.setAllData(data.detectionHistory)
         binding.rvHistory.apply {
             setHasFixedSize(true)
@@ -64,7 +74,13 @@ class HistoryActivity : AppCompatActivity(), StateCallback<HistoryResponse> {
     }
 
     override fun onLoading() {
-
+        val historyToolbar = ObjectAnimator.ofFloat(binding.tbHistory, View.ALPHA, 0f).setDuration(500)
+        val historyRV = ObjectAnimator.ofFloat(binding.rvHistory, View.ALPHA, 0f).setDuration(500)
+        val progressBar = ObjectAnimator.ofFloat(binding.historyLoading, View.ALPHA, 1f).setDuration(500)
+        AnimatorSet().apply {
+            playTogether(progressBar, historyToolbar, historyRV)
+            start()
+        }
     }
 
     override fun onFailed(message: String?) {

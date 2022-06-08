@@ -170,6 +170,7 @@ class Repository {
     fun getHistory(id: String): LiveData<State<HistoryResponse>> {
         val history = MutableLiveData<State<HistoryResponse>>()
 
+        history.postValue(State.Loading())
         retrofit.getHistory(id).enqueue(object : Callback<HistoryResponse> {
             override fun onResponse(
                 call: Call<HistoryResponse>,
