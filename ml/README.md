@@ -17,4 +17,4 @@ Restnet use 'caffe' style / zero-centering on preprocessing the input data, so w
 
 
 ## preprocess_function.ipynb
-This used on Cloud Function for preprocess the image data before fed it to the model.
+This used on Cloud Function for preprocess the image data before fed into the model.
