@@ -27,6 +27,7 @@ async function editUser(req, res) {
     let email = req.body.email || null;
     let address = req.body.address || null;
     let phone = req.body.phone || null;
+    let url_picture = req.body.url_picture || null;
 
     // Validate email
     if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(req.body.email) && email !== null) {
@@ -68,7 +69,7 @@ async function editUser(req, res) {
                     });
             }
             // update user
-            db.none('UPDATE public.user SET name = $1, email = $2, address = $3, phone = $4 WHERE user_id = $5', [name, email, address, phone, user_id])
+            db.none('UPDATE public.user SET name = $1, email = $2, address = $3, phone = $4, url_picture = $6 WHERE user_id = $5', [name, email, address, phone, user_id, url_picture])
                 .then(function () {
                     res.status(204).json({
                         status: 204,
