@@ -51,6 +51,11 @@ interface ApiService {
         @Field("recommendation") recommendation: String,
         @Field("image_url") imageUrl: String,
     ): Call<HistorySuccessResponse>
+
+    @GET("detection_history/{id}")
+    fun getHistory(
+        @Path("id") id: String
+    ): Call<HistoryResponse>
 }
 
 interface MapsApiService {

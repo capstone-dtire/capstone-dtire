@@ -3,6 +3,7 @@ package com.dtire.dtireapp.ui.result
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -32,28 +33,51 @@ class ResultActivity : AppCompatActivity(), StateCallback<HistorySuccessResponse
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        val origin = intent.getStringExtra(EXTRA_ORIGIN)
         val imageUrl = intent.getStringExtra(EXTRA_IMAGE_URL)
+
         Glide.with(this)
             .load(imageUrl)
             .into(binding.ivResultPicture)
 
-        val result = intent.getDoubleExtra(EXTRA_IMAGE_RESULT, 0.0)
-        if (result <= 0.5) {
-            binding.apply {
-                condition = "crack"
-                recommendation = getString(R.string.result_crack)
-                tvResultTitle.text = getString(R.string.result)
-                tvResultDetail.text = getString(R.string.result_crack)
+        if (origin == "home") {
+            val result = intent.getDoubleExtra(EXTRA_IMAGE_RESULT, 0.0)
+            binding.tvResultDate.visibility = invisible
+            if (result <= 0.5) {
+                binding.apply {
+                    condition = "Crack"
+                    recommendation = getString(R.string.result_crack)
+                    tvResultTitle.text = getString(R.string.crack)
+                    tvResultDetail.text = getString(R.string.result_crack)
+                }
+            } else {
+                binding.apply {
+                    condition = "Ok"
+                    recommendation = getString(R.string.result_ok)
+                    tvResultTitle.text = getString(R.string.ok)
+                    tvResultDetail.text = getString(R.string.result_ok)
+                }
             }
-        } else {
-            binding.apply {
-                condition = "ok"
-                recommendation = getString(R.string.result_ok)
-                tvResultTitle.text = getString(R.string.result)
-                tvResultDetail.text = getString(R.string.result_ok)
+            addToHistory(imageUrl)
+        } else if (origin == "history") {
+            binding.tvResultDate.text = intent.getStringExtra(EXTRA_IMAGE_DATE)
+            val result = intent.getStringExtra(EXTRA_IMAGE_RESULT)
+            Log.d("TAG", "onCreateResult: $result")
+            if (result == "Crack" || result == "crack") {
+                binding.apply {
+                    tvResultTitle.text = getString(R.string.crack)
+                    tvResultDetail.text = getString(R.string.result_crack)
+                }
+            } else if (result == "Ok" || result == "ok") {
+                binding.apply {
+                    tvResultTitle.text = getString(R.string.ok)
+                    tvResultDetail.text = getString(R.string.result_ok)
+                }
             }
         }
+    }
 
+    private fun addToHistory(imageUrl: String?) {
         preferences = UserPreference(this)
         val id = preferences.getUserId()
         if (imageUrl != null) {
@@ -66,7 +90,6 @@ class ResultActivity : AppCompatActivity(), StateCallback<HistorySuccessResponse
             }
         }
     }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -101,6 +124,7 @@ class ResultActivity : AppCompatActivity(), StateCallback<HistorySuccessResponse
         const val EXTRA_IMAGE = "extra_image"
         const val EXTRA_IMAGE_URL = "extra_image_url"
         const val EXTRA_IMAGE_RESULT = "extra_image_result"
+        const val EXTRA_IMAGE_DATE = "extra_image_date"
         const val EXTRA_ORIGIN = "extra_origin"
     }
 }

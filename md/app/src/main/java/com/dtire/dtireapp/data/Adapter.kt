@@ -1,41 +1,54 @@
 package com.dtire.dtireapp.data
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.dtire.dtireapp.data.entity.History
+import com.dtire.dtireapp.data.response.DetectionHistoryItem
 import com.dtire.dtireapp.databinding.HistoryItemBinding
+import com.dtire.dtireapp.ui.result.ResultActivity
 
 class Adapter: RecyclerView.Adapter<Adapter.AdapterViewHolder>() {
-    private val listHistory = ArrayList<History>()
+    private val listHistory = ArrayList<DetectionHistoryItem?>()
 
-    fun setAllData(data: List<History>) {
+    fun setAllData(data: List<DetectionHistoryItem>) {
+        val reversedData = data.reversed()
         listHistory.apply {
             clear()
-            addAll(data)
+            addAll(reversedData)
         }
     }
 
     class AdapterViewHolder(private var binding: HistoryItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(history: History) {
+        fun bind(history: DetectionHistoryItem) {
             binding.apply {
                 Glide.with(itemView.context)
-                    .load(history.photoUrl)
+                    .load(history.imageUrl)
                     .circleCrop()
                     .into(ivHistoryItem)
-                tvHistoryItemTitle.text = history.title
-                tvHistoryItemDate.text = history.date
+                tvHistoryItemTitle.text = history.conditionTitle
+                tvHistoryItemDate.text = history.dateOfCheck
+            }
+
+            itemView.setOnClickListener {
+                val intent = Intent(itemView.context, ResultActivity::class.java)
+                intent.putExtra(ResultActivity.EXTRA_IMAGE_URL, history.imageUrl.toString())
+                intent.putExtra(ResultActivity.EXTRA_IMAGE_RESULT, history.conditionTitle)
+                intent.putExtra(ResultActivity.EXTRA_IMAGE_DATE, history.dateOfCheck)
+                intent.putExtra(ResultActivity.EXTRA_ORIGIN, "history")
+                itemView.context.startActivity(intent)
             }
         }
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdapterViewHolder {
         val binding = HistoryItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return AdapterViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: AdapterViewHolder, position: Int) {
-        holder.bind(listHistory[position])
+        listHistory[position]?.let { holder.bind(it) }
     }
 
     override fun getItemCount(): Int = listHistory.size

@@ -43,21 +43,30 @@
                 app:shapeAppearanceOverlay="@style/roundedImageView" />
 
             <TextView
-                android:id="@+id/tv_result_title"
+                android:id="@+id/tv_result_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/primary_text"
-                android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="@+id/iv_result_picture"
                 app:layout_constraintTop_toBottomOf="@+id/iv_result_picture" />
 
             <TextView
-                android:id="@+id/tv_result_detail"
+                android:id="@+id/tv_result_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/primary_text"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/tv_result_date"
+                app:layout_constraintTop_toBottomOf="@+id/tv_result_date" />
+
+            <TextView
+                android:id="@+id/tv_result_detail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_text"
                 android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="@+id/tv_result_title"
+                app:layout_constraintEnd_toEndOf="@+id/iv_result_picture"
+                app:layout_constraintStart_toStartOf="@+id/iv_result_picture"
                 app:layout_constraintTop_toBottomOf="@+id/tv_result_title" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 

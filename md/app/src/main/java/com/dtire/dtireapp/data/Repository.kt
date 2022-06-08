@@ -166,4 +166,27 @@ class Repository {
             })
         return history
     }
+
+    fun getHistory(id: String): LiveData<State<HistoryResponse>> {
+        val history = MutableLiveData<State<HistoryResponse>>()
+
+        retrofit.getHistory(id).enqueue(object : Callback<HistoryResponse> {
+            override fun onResponse(
+                call: Call<HistoryResponse>,
+                response: Response<HistoryResponse>
+            ) {
+                if (response.isSuccessful) {
+                    history.postValue(State.Success(response.body()))
+                } else {
+                    history.postValue(State.Error(response.body()?.message))
+                }
+            }
+
+            override fun onFailure(call: Call<HistoryResponse>, t: Throwable) {
+                history.postValue(State.Error(t.message))
+            }
+
+        })
+        return history
+    }
 }
