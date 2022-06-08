@@ -1,10 +1,10 @@
 const db = require('../config/database');
 
-async function editUser(req, res) {
+function editUser(req, res) {
     const user_id = req.params.user_id;
 
     // Check if the user_id is existent
-    await db.any('SELECT * FROM public.user WHERE user_id = $1', [user_id])
+    db.any('SELECT * FROM public.user WHERE user_id = $1', [user_id])
         .then(function (user) {
             if (user.length === 0) {
                 res.status(404).json({
@@ -40,7 +40,7 @@ async function editUser(req, res) {
     }
 
     // query if name or email is null
-    await db.one('SELECT name, email, address, phone FROM public.user WHERE user_id = $1', [user_id])
+    db.one('SELECT name, email, address, phone FROM public.user WHERE user_id = $1', [user_id])
         .then(function (user) {
             if (name === null) {
                 name = user.name;
@@ -56,7 +56,7 @@ async function editUser(req, res) {
             }
             else {
                 // check if email is already in use
-                await db.one('SELECT email FROM public.user WHERE email = $1 and user_id != $2', [email, user_id])
+                db.one('SELECT email FROM public.user WHERE email = $1 and user_id != $2', [email, user_id])
                     .then(function (user) {
                         // Check if the result is empty
                         if (user.email !== null) {
@@ -69,7 +69,7 @@ async function editUser(req, res) {
                     });
             }
             // update user
-            await db.none('UPDATE public.user SET name = $1, email = $2, address = $3, phone = $4, url_picture = $6 WHERE user_id = $5', [name, email, address, phone, user_id, url_picture])
+            db.none('UPDATE public.user SET name = $1, email = $2, address = $3, phone = $4, url_picture = $6 WHERE user_id = $5', [name, email, address, phone, user_id, url_picture])
                 .then(function () {
                     res.status(204).json({
                         status: 204,
