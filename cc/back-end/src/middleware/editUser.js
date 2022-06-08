@@ -40,7 +40,7 @@ function editUser(req, res) {
     }
 
     // query if name or email is null
-    db.one('SELECT name, email, address, phone FROM public.user WHERE user_id = $1', [user_id])
+    db.one('SELECT name, email, address, phone, url_picture FROM public.user WHERE user_id = $1', [user_id])
         .then(function (user) {
             if (name === null) {
                 name = user.name;
@@ -53,6 +53,9 @@ function editUser(req, res) {
             }
             if (phone === null) {
                 phone = user.phone;
+            }
+            if (url_picture === null) {
+                url_picture = user.url_picture;
             }
             else {
                 // check if email is already in use
