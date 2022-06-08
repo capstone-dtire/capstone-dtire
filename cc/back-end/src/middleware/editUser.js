@@ -56,7 +56,7 @@ async function editUser(req, res) {
             }
             else {
                 // check if email is already in use
-                db.one('SELECT email FROM public.user WHERE email = $1 and user_id != $2', [email, user_id])
+                await db.one('SELECT email FROM public.user WHERE email = $1 and user_id != $2', [email, user_id])
                     .then(function (user) {
                         // Check if the result is empty
                         if (user.email !== null) {
@@ -69,7 +69,7 @@ async function editUser(req, res) {
                     });
             }
             // update user
-            db.none('UPDATE public.user SET name = $1, email = $2, address = $3, phone = $4, url_picture = $6 WHERE user_id = $5', [name, email, address, phone, user_id, url_picture])
+            await db.none('UPDATE public.user SET name = $1, email = $2, address = $3, phone = $4, url_picture = $6 WHERE user_id = $5', [name, email, address, phone, user_id, url_picture])
                 .then(function () {
                     res.status(204).json({
                         status: 204,
