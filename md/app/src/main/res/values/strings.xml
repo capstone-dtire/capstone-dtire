@@ -62,4 +62,6 @@
     <string name="result_ok">Our system detects the test result from your tire image as OK and is still good.</string>
     <string name="crack">Cracked</string>
     <string name="ok">Normal</string>
+    <string name="back">Back</string>
+    <string name="map_distance">%s km</string>
 </resources>

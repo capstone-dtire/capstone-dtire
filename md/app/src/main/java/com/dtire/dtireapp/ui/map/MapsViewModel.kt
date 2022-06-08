@@ -7,4 +7,6 @@ class MapsViewModel: ViewModel() {
     private val repository = Repository()
 
     fun getNearbyPlace(url: String) = repository.getNearbyPlaces(url)
+
+    fun getPlaceDetail(url: String) = repository.getPlaceDetail(url)
 }

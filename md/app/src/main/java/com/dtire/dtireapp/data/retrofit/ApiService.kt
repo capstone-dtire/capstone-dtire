@@ -63,6 +63,13 @@ interface MapsApiService {
     suspend fun getNearbyPlaces(
         @Url url: String
     ): Response<MapsResponse>
+
+    @GET
+    suspend fun getPlaceDetail(
+        @Url url: String
+    ): Response<PlaceDetailResponse>
+
+
 }
 
 interface UploadImageApiService {

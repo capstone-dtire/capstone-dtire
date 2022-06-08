@@ -127,15 +127,30 @@ class Repository {
         val response = mapsRetrofit.getNearbyPlaces(url)
         if (response.body()?.results?.size!! > 0) {
             emit(State.Success(response.body()!!))
-            Log.d("TAG", "getNearbyPlaces: berhasil: ${response.body()}")
         } else {
             emit(State.Error(response.message()))
-            Log.d("TAG", "getNearbyPlaces: gagal1: ${response.body()}")
         }
     }.catch {
         emit(State.Error(it.message))
-        Log.d("TAG", "getNearbyPlaces: gagal2 : ${it.message}")
     }.flowOn(Dispatchers.IO)
+
+    fun getPlaceDetail(url: String): Flow<State<Any>> = flow<State<Any>> {
+        emit(State.Loading())
+
+        val response = mapsRetrofit.getPlaceDetail(url)
+        if (response.isSuccessful) {
+            response.body()?.let { emit(State.Success(it)) }
+            Log.d("TAG", "getPlaceDetail: berhasil: ${response.body()}")
+        } else {
+            emit(State.Error(response.message()))
+            Log.d("TAG", "getPlaceDetail: gagal1: ${response.message()}")
+        }
+    }.catch {
+        emit(State.Error(it.message))
+        Log.d("TAG", "getPlaceDetail: gagal2: ${it.message!!}")
+    }.flowOn(Dispatchers.IO)
+
+
 
     fun addToHistory(id: String,
                      condition: String,
