@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/join_us"
                 android:textSize="18sp"
-                android:textColor="@color/primary_green"
+                android:textColor="?attr/colorPrimary"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="@+id/iv_register_logo"
                 app:layout_constraintStart_toStartOf="@+id/iv_register_logo"
@@ -55,7 +55,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
                 android:text="@string/name"
-                android:textColor="@color/primary_text"
+                android:textColor="?attr/colorOnPrimary"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_register_message" />
 
@@ -85,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:text="@string/email"
-                android:textColor="@color/primary_text"
+                android:textColor="?attr/colorOnPrimary"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_name_error" />
 
@@ -115,7 +115,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:text="@string/password"
-                android:textColor="@color/primary_text"
+                android:textColor="?attr/colorOnPrimary"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_email_error" />
 
@@ -145,7 +145,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:text="@string/confirm_password"
-                android:textColor="@color/primary_text"
+                android:textColor="?attr/colorOnPrimary"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_password_error" />
 
@@ -174,7 +174,7 @@
                 style="@style/ButtonStyle"
                 android:layout_marginTop="32dp"
                 android:background="@drawable/rounded_corner"
-                android:backgroundTint="@color/primary_green"
+                android:backgroundTint="?attr/colorPrimary"
                 android:text="@string/sign_up"
                 android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -187,7 +187,7 @@
                 android:layout_marginTop="16dp"
                 android:background="@drawable/rounded_corner_with_stroke"
                 android:text="@string/login"
-                android:textColor="@color/primary_green"
+                android:textColor="?attr/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/btn_register" />

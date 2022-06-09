@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:text="@string/choose"
         android:textAlignment="center"
-        android:textColor="@color/primary_text"
+        android:textColor="?attr/colorOnPrimary"
         android:textStyle="bold"
         android:textSize="18sp"/>
 
@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_baseline_camera_alt_24"
-            app:tint="@color/primary_text"
+            app:tint="?attr/colorOnPrimary"
             android:contentDescription="@string/from_camera" />
         <TextView
             android:layout_width="match_parent"
@@ -40,7 +40,7 @@
             android:text="@string/from_camera"
             android:layout_marginStart="8dp"
             android:textSize="16sp"
-            android:textColor="@color/primary_text"/>
+            android:textColor="?attr/colorOnPrimary"/>
     </LinearLayout>
 
     <LinearLayout
@@ -55,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_baseline_photo_library_24"
-            app:tint="@color/primary_text"
+            app:tint="?attr/colorOnPrimary"
             android:contentDescription="@string/from_gallery" />
         <TextView
             android:layout_width="match_parent"
@@ -63,7 +63,7 @@
             android:text="@string/from_gallery"
             android:layout_marginStart="8dp"
             android:textSize="16sp"
-            android:textColor="@color/primary_text"/>
+            android:textColor="?attr/colorOnPrimary"/>
     </LinearLayout>
 
 

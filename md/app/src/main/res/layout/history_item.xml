@@ -6,14 +6,17 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
     app:cardPreventCornerOverlap="true"
-    app:cardElevation="0dp">
+    android:layout_gravity="center"
+    android:background="@color/transparent"
+    app:cardElevation="0dp"
+    android:elevation="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="12dp"
         android:background="@drawable/rounded_corner"
-        android:backgroundTint="@color/grey_200">
+        android:backgroundTint="?attr/colorSecondaryVariant">
 
         <ImageView
             android:id="@+id/iv_history_item"
@@ -38,7 +41,7 @@
                 android:id="@+id/tv_history_item_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/primary_text"
+                android:textColor="?attr/colorOnPrimary"
                 android:textStyle="bold"
                 android:text="@string/title_of_the_condition" />
 
@@ -57,7 +60,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/iv_history_item"
             app:srcCompat="@drawable/ic_baseline_keyboard_arrow_right_24"
-            app:tint="@color/primary_text"
+            app:tint="?attr/colorOnPrimary"
             android:contentDescription="@string/right_arrow_icon" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

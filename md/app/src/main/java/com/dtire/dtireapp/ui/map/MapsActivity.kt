@@ -160,7 +160,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, StateCallback<Any>
                                     tvRepairShopPhone.visibility = visible
                                     tvRepairShopPhone.text = data.result.formattedPhoneNumber
                                     btnMarkerCall.apply {
-                                        isEnabled = true
+                                        visibility = visible
                                         backgroundTintList = ColorStateList.valueOf(resources.getColor(R.color.primary_green))
                                         setOnClickListener {
                                             Log.d("TAG", "callClick: Halo")
@@ -170,10 +170,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, StateCallback<Any>
                             }
                             else {
                                 binding.apply {
-                                    binding.tvRepairShopPhone.visibility = gone
+                                    binding.tvRepairShopPhone.visibility = invisible
                                     btnMarkerCall.apply {
-                                        isEnabled = false
-                                        backgroundTintList = ColorStateList.valueOf(resources.getColor(R.color.secondary_green))
+                                        visibility = invisible
                                     }
 
                                 }
@@ -227,7 +226,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, StateCallback<Any>
                 }
             } else {
                 binding.tvRepairShopStatus.apply {
-                    visibility = gone
+                    visibility = invisible
                     text = ""
                 }
             }

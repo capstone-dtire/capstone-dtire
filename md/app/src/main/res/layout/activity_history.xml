@@ -10,8 +10,10 @@
         android:id="@+id/tb_history"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/white"
-        android:alpha="0"
+        android:background="@color/transparent"
+        android:alpha="1"
+        app:titleTextColor="?attr/colorOnPrimary"
+        android:theme="@style/ToolbarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
