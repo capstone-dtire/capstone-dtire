@@ -9,7 +9,16 @@ It contains the following content:
 - back-end: Source code for the back-end and how to use it.
 
 ## md
-This is a directory for the Mobile Development part of this project.
+This is a directory for the Mobile Development part of this project.  
+It contains all the android app development code.
+
+App Features:
+- Login and Register
+- Scan tire (using your camera / from gallery) and get result as tire condition
+- Get near repair shops location with gmaps
+- Call the repair shop (if the phone number data is available)
+- Get user scan histories
+- Edit user profile
 
 ## ml
 This is a directory for the Machine Learning part of this project.
