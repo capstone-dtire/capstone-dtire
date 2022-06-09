@@ -2,9 +2,11 @@ package com.dtire.dtireapp.ui.map
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.location.Location
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -163,7 +165,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, StateCallback<Any>
                                         visibility = visible
                                         backgroundTintList = ColorStateList.valueOf(resources.getColor(R.color.primary_green))
                                         setOnClickListener {
-                                            Log.d("TAG", "callClick: Halo")
+                                            startActivity(Intent(Intent.ACTION_CALL, Uri.parse("tel:${data.result.formattedPhoneNumber}")))
                                         }
                                     }
                                 }
